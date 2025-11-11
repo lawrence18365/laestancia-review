@@ -5,64 +5,139 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>La Estancia · Reseña</title>
   <style>
+    :root {
+      --bg: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
+      --card: rgba(12, 11, 10, 0.6);
+      --border: rgba(255, 214, 142, 0.25);
+      --gold: #e6c07b;
+      --text: #f5f1ea;
+      --muted: rgba(245, 241, 234, 0.7);
+    }
+    * {
+      box-sizing: border-box;
+    }
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #f5f5f5;
       margin: 0;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      background: var(--bg);
+      background-attachment: fixed;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      padding: 20px;
     }
     .card {
-      background: #fff;
-      max-width: 420px;
-      width: 100%;
-      padding: 28px 24px 24px;
-      border-radius: 16px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      width: min(460px, 100%);
+      background: linear-gradient(160deg, rgba(15,14,13,0.85), rgba(6,6,6,0.35));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px 24px 22px;
       text-align: center;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      animation: rise 600ms ease-out;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     .logo {
-      width: 150px;
+      width: 160px;
       height: auto;
-      margin: 0 auto 18px;
+      margin: 0 auto 16px;
       display: block;
       border-radius: 999px;
+      border: 1px solid rgba(230,192,123,0.28);
+      background: rgba(0,0,0,0.3);
     }
     h1 {
       font-size: 1.1rem;
-      margin-bottom: 0.65rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.45rem;
     }
-    p {
-      margin: 0;
-      color: #555;
+    p.subtitle {
+      margin-top: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
       line-height: 1.5;
+    }
+    .timer {
+      margin-top: 1.1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(230,192,123,0.05);
+      border: 1px solid rgba(230,192,123,0.28);
+      border-radius: 999px;
+      padding: 6px 14px 6px 10px;
+      font-size: 0.74rem;
+      color: var(--text);
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--gold);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 1; }
     }
     small {
       display: block;
-      margin-top: 1.4rem;
-      color: #888;
+      margin-top: 1.1rem;
       font-size: 0.7rem;
+      color: rgba(245, 241, 234, 0.45);
+    }
+    small a {
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(230,192,123,0.35);
+      padding-bottom: 1px;
+    }
+    @media (max-width: 460px) {
+      .card {
+        padding: 24px 18px 20px;
+      }
+      h1 {
+        font-size: 1rem;
+      }
+      p.subtitle {
+        font-size: 0.8rem;
+      }
+      .logo {
+        width: 140px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <!-- actual logo -->
     <img
       src="https://i.postimg.cc/9fNDSz30/ac9a437c-35df-4b6e-9baa-8d08558366de.jpg"
       alt="La Estancia"
       class="logo"
     />
     <h1 id="msg">Gracias por tu visita — nuestro equipo te invita a compartir tu experiencia.</h1>
-    <p>En unos segundos te llevamos a Google para dejar tu reseña.</p>
-    <small>Si no pasa nada, <a id="fallback" href="https://g.page/r/Caz8tUjHvtOBEBM/review">toca aquí</a>.</small>
+    <p class="subtitle">Te vamos a llevar a la página de reseñas de Google para que cuentes cómo te atendimos.</p>
+
+    <div class="timer">
+      <span class="dot"></span>
+      <span id="count">En 5 segundos te redirigimos…</span>
+    </div>
+
+    <small>
+      ¿No te redirige?
+      <a id="fallback" href="https://g.page/r/Caz8tUjHvtOBEBM/review">Toca aquí para abrir Google</a>.
+    </small>
   </div>
 
   <script>
-    // staff codes → names
+    // 1. staff codes → names
     const STAFF = {
       "EDUARDO001": "Eduardo",
       "PEDROLOPEZ002": "Pedro López",
@@ -78,25 +153,35 @@
       "FERNANDO012": "Fernando"
     };
 
-    // read ?card= from URL
+    // 2. read ?card= from URL
     const params = new URLSearchParams(window.location.search);
     const cardCode = params.get('card');
-    const name = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : null;
+    const staffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : null;
 
-    // message with staff name
+    // 3. update message
     const msgEl = document.getElementById('msg');
-    if (name) {
-      msgEl.textContent = `Gracias por tu visita — ${name} te invita a compartir tu experiencia.`;
+    if (staffName) {
+      msgEl.textContent = `Gracias por tu visita — ${staffName} te invita a compartir tu experiencia.`;
     }
 
-    // your Google review link
+    // 4. redirect setup
     const REVIEW_URL = "https://g.page/r/Caz8tUjHvtOBEBM/review";
     document.getElementById('fallback').href = REVIEW_URL;
 
-    // auto redirect after 2s
+    let seconds = 5;
+    const countEl = document.getElementById('count');
+    const interval = setInterval(() => {
+      seconds--;
+      if (seconds > 0) {
+        countEl.textContent = `En ${seconds} segundo${seconds === 1 ? '' : 's'} te redirigimos…`;
+      } else {
+        clearInterval(interval);
+      }
+    }, 1000);
+
     setTimeout(() => {
       window.location.href = REVIEW_URL;
-    }, 2000);
+    }, 5000);
   </script>
 </body>
 </html>
