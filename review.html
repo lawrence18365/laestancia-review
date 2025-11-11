@@ -1,1 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>La Estancia · Reseña</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .card {
+      background: #fff;
+      max-width: 420px;
+      width: 100%;
+      padding: 28px 24px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+    .logo {
+      width: 110px;
+      height: auto;
+      margin: 0 auto 18px;
+      background: #ddd;
+      border-radius: 999px;
+    }
+    h1 {
+      font-size: 1.1rem;
+      margin-bottom: 0.65rem;
+    }
+    p {
+      margin: 0;
+      color: #555;
+      line-height: 1.5;
+    }
+    small {
+      display: block;
+      margin-top: 1.4rem;
+      color: #888;
+      font-size: 0.7rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <!-- replace src with your logo once you have it -->
+    <img src="logo.png" alt="La Estancia" class="logo" />
+    <h1 id="msg">Gracias por tu visita — nuestro equipo te invita a compartir tu experiencia.</h1>
+    <p>En unos segundos te llevamos a Google para dejar tu reseña.</p>
+    <small>Si no pasa nada, <a id="fallback" href="https://g.page/r/Caz8tUjHvtOBEBM/review">toca aquí</a>.</small>
+  </div>
+
+  <script>
+    // 1. map staff codes to names
+    const STAFF = {
+      "EDUARDO001": "Eduardo",
+      "PEDROLOPEZ002": "Pedro López",
+      "PEDROOROCIO003": "Pedro Orocio",
+      "EMILIANO004": "Emiliano",
+      "DAVID005": "David",
+      "LEOGASCA006": "Leo Gasca",
+      "LEOREYNOSO007": "Leo Reynoso",
+      "ULISES008": "Ulises",
+      "GERARDO009": "Gerardo",
+      "CARLOS010": "Carlos",
+      "JULIO011": "Julio",
+      "FERNANDO012": "Fernando"
+    };
+
+    // 2. read ?card= from URL
+    const params = new URLSearchParams(window.location.search);
+    const cardCode = params.get('card');
+
+    // 3. pick name or fallback
+    const name = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : null;
+
+    // 4. update message
+    const msgEl = document.getElementById('msg');
+    if (name) {
+      msgEl.textContent = `Gracias por tu visita — ${name} te invita a compartir tu experiencia.`;
+    }
+
+    // 5. redirect after 2 seconds
+    const REVIEW_URL = "https://g.page/r/Caz8tUjHvtOBEBM/review";
+    setTimeout(() => {
+      window.location.href = REVIEW_URL;
+    }, 2000);
+
+    // update fallback link too
+    document.getElementById('fallback').href = REVIEW_URL;
+  </script>
+</body>
+</html>
 
