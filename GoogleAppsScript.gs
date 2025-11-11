@@ -18,7 +18,7 @@
 // ========================================
 // CONFIGURATION - UPDATE THIS!
 // ========================================
-const MANAGER_EMAIL = "manager@laestancia.com"; // CHANGE THIS TO YOUR ACTUAL EMAIL
+const MANAGER_EMAIL = "lbarwe1@gmail.com"; // Manager email for notifications
 
 /**
  * Run this function ONCE to set up your sheets
@@ -486,6 +486,10 @@ function setupAllTimeStatsSheet(sheet, rawDataSheet) {
   sheet.setFrozenRows(4);
 }
 
+/**
+ * Handles POST requests from the review system
+ * CORS-compatible: Returns ContentService with proper headers
+ */
 function doPost(e) {
   try {
     // Parse the incoming data
@@ -500,7 +504,8 @@ function doPost(e) {
     }
 
   } catch (error) {
-    // Return error response
+    // Return error response with CORS-friendly format
+    Logger.log('Error in doPost: ' + error.toString());
     return ContentService
       .createTextOutput(JSON.stringify({
         status: 'error',

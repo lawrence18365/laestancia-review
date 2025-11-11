@@ -178,6 +178,7 @@
     }
 
     // Send tracking data to Google Sheets
+    // CORS-compatible: Uses text/plain content type to avoid preflight requests
     function trackCardScan(rating) {
       if (WEBHOOK_URL && WEBHOOK_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
         const data = {
@@ -187,6 +188,8 @@
           timestamp: new Date().toISOString()
         };
 
+        // Using text/plain prevents CORS preflight (OPTIONS) requests
+        // redirect: "follow" is required for Google Apps Script
         fetch(WEBHOOK_URL, {
           redirect: "follow",
           method: 'POST',
@@ -194,10 +197,14 @@
             'Content-Type': 'text/plain;charset=utf-8',
           },
           body: JSON.stringify(data)
-        }).then(response => {
-          console.log('Tracking successful:', response);
-        }).catch(err => {
+        })
+        .then(response => response.text())
+        .then(responseText => {
+          console.log('Tracking successful:', responseText);
+        })
+        .catch(err => {
           console.error('Tracking error:', err);
+          // Fail silently - user experience continues even if tracking fails
         });
       }
     }
