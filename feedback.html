@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>La Estancia · Feedback</title>
+  <style>
+    :root {
+      --bg: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
+      --card: rgba(12, 11, 10, 0.6);
+      --border: rgba(255, 214, 142, 0.25);
+      --gold: #e6c07b;
+      --text: #f5f1ea;
+      --muted: rgba(245, 241, 234, 0.7);
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      background-attachment: fixed;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      padding: 20px;
+    }
+    .card {
+      width: min(520px, 100%);
+      background: linear-gradient(160deg, rgba(15,14,13,0.85), rgba(6,6,6,0.35));
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 26px 24px 22px;
+      text-align: center;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      animation: rise 600ms ease-out;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo {
+      width: 160px;
+      height: auto;
+      margin: 0 auto 16px;
+      display: block;
+      border-radius: 999px;
+      border: 1px solid rgba(230,192,123,0.28);
+      background: rgba(0,0,0,0.3);
+    }
+    h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.45rem;
+    }
+    p.subtitle {
+      margin-top: 0;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.2rem;
+      text-align: left;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(230,192,123,0.3);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(0,0,0,0.5);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background: #f0d08c;
+      transform: translateY(-1px);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .rating-display {
+      display: inline-block;
+      margin-bottom: 1rem;
+      color: var(--gold);
+      font-size: 1.5rem;
+    }
+    .success-message {
+      display: none;
+      padding: 1rem;
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      border-radius: 8px;
+      color: #8bc34a;
+      margin-bottom: 1rem;
+    }
+    .success-message.show {
+      display: block;
+    }
+    small {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.7rem;
+      color: rgba(245, 241, 234, 0.45);
+    }
+    @media (max-width: 460px) {
+      .card {
+        padding: 24px 18px 20px;
+      }
+      h1 {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img
+      src="https://i.postimg.cc/9fNDSz30/ac9a437c-35df-4b6e-9baa-8d08558366de.jpg"
+      alt="La Estancia"
+      class="logo"
+    />
+    <h1>Gracias por tu honestidad</h1>
+    <div class="rating-display" id="ratingDisplay"></div>
+    <p class="subtitle">Tu opinión nos ayuda a mejorar. Por favor cuéntanos qué podemos hacer mejor.</p>
+
+    <div class="success-message" id="successMessage">
+      ¡Gracias! Tu feedback ha sido enviado. Lo revisaremos pronto.
+    </div>
+
+    <form id="feedbackForm">
+      <div class="form-group">
+        <label for="name">Tu nombre (opcional)</label>
+        <input type="text" id="name" placeholder="Nombre">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email (opcional)</label>
+        <input type="email" id="email" placeholder="correo@ejemplo.com">
+      </div>
+
+      <div class="form-group">
+        <label for="feedback">¿Qué podemos mejorar? *</label>
+        <textarea id="feedback" placeholder="Cuéntanos tu experiencia..." required></textarea>
+      </div>
+
+      <button type="submit" id="submitBtn">Enviar Feedback</button>
+    </form>
+
+    <small>
+      Tu feedback es confidencial y será revisado por nuestro equipo de gerencia.
+    </small>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyFWfR9948W5zNWvPK4DxklTnLgI-WZPsLkrMSH1PaBniPOtcW5GlkQqG9qXVdsMlfNzw/exec";
+
+    // Get URL parameters
+    const params = new URLSearchParams(window.location.search);
+    const rating = params.get('rating');
+    const cardCode = params.get('card');
+    const staffName = params.get('staff');
+
+    // Display rating
+    const ratingDisplay = document.getElementById('ratingDisplay');
+    if (rating) {
+      const stars = '★'.repeat(parseInt(rating)) + '☆'.repeat(5 - parseInt(rating));
+      ratingDisplay.textContent = stars;
+    }
+
+    // Handle form submission
+    const form = document.getElementById('feedbackForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const successMessage = document.getElementById('successMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Enviando...';
+
+      const feedbackData = {
+        type: 'feedback',
+        rating: rating,
+        cardCode: cardCode,
+        staffName: staffName,
+        customerName: document.getElementById('name').value,
+        customerEmail: document.getElementById('email').value,
+        feedback: document.getElementById('feedback').value,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        const response = await fetch(WEBHOOK_URL, {
+          redirect: "follow",
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify(feedbackData)
+        });
+
+        // Show success message
+        successMessage.classList.add('show');
+        form.style.display = 'none';
+
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          window.location.href = 'https://laestancia.com';
+        }, 3000);
+
+      } catch (error) {
+        console.error('Error:', error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Error - Intentar de nuevo';
+      }
+    });
+  </script>
+</body>
+</html>

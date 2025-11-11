@@ -63,29 +63,32 @@
       font-size: 0.85rem;
       line-height: 1.5;
     }
-    .timer {
-      margin-top: 1.1rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(230,192,123,0.05);
-      border: 1px solid rgba(230,192,123,0.28);
-      border-radius: 999px;
-      padding: 6px 14px 6px 10px;
-      font-size: 0.74rem;
-      color: var(--text);
+    .stars {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin: 1.5rem 0;
     }
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--gold);
-      animation: pulse 1.4s ease-in-out infinite;
+    .star {
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: rgba(230,192,123,0.3);
+      user-select: none;
     }
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.4; }
-      100% { transform: scale(1); opacity: 1; }
+    .star:hover,
+    .star.active {
+      color: var(--gold);
+      transform: scale(1.15);
+    }
+    .star:active {
+      transform: scale(0.95);
+    }
+    .prompt {
+      margin-top: 0.8rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      min-height: 20px;
     }
     small {
       display: block;
@@ -123,21 +126,31 @@
       class="logo"
     />
     <h1 id="msg">Gracias por tu visita — nuestro equipo te invita a compartir tu experiencia.</h1>
-    <p class="subtitle">Te vamos a llevar a la página de reseñas de Google para que cuentes cómo te atendimos.</p>
+    <p class="subtitle">¿Cómo calificarías tu experiencia con nosotros?</p>
 
-    <div class="timer">
-      <span class="dot"></span>
-      <span id="count">En 5 segundos te redirigimos…</span>
+    <div class="stars">
+      <span class="star" data-rating="1">★</span>
+      <span class="star" data-rating="2">★</span>
+      <span class="star" data-rating="3">★</span>
+      <span class="star" data-rating="4">★</span>
+      <span class="star" data-rating="5">★</span>
     </div>
 
+    <p class="prompt">Toca las estrellas para calificar</p>
+
     <small>
-      ¿No te redirige?
-      <a id="fallback" href="https://g.page/r/Caz8tUjHvtOBEBM/review">Toca aquí para abrir Google</a>.
+      Tu opinión es importante para nosotros
     </small>
   </div>
 
   <script>
-    // 1. staff codes → names
+    // ========================================
+    // GOOGLE SHEETS TRACKING CONFIGURATION
+    // ========================================
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyFWfR9948W5zNWvPK4DxklTnLgI-WZPsLkrMSH1PaBniPOtcW5GlkQqG9qXVdsMlfNzw/exec";
+    const REVIEW_URL = "https://g.page/r/Caz8tUjHvtOBEBM/review";
+
+    // Staff codes → names
     const STAFF = {
       "EDUARDO001": "Eduardo",
       "PEDROLOPEZ002": "Pedro López",
@@ -153,35 +166,90 @@
       "FERNANDO012": "Fernando"
     };
 
-    // 2. read ?card= from URL
+    // Read ?card= from URL
     const params = new URLSearchParams(window.location.search);
     const cardCode = params.get('card');
     const staffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : null;
 
-    // 3. update message
+    // Update personalized message
     const msgEl = document.getElementById('msg');
     if (staffName) {
       msgEl.textContent = `Gracias por tu visita — ${staffName} te invita a compartir tu experiencia.`;
     }
 
-    // 4. redirect setup
-    const REVIEW_URL = "https://g.page/r/Caz8tUjHvtOBEBM/review";
-    document.getElementById('fallback').href = REVIEW_URL;
+    // Send tracking data to Google Sheets
+    function trackCardScan(rating) {
+      if (WEBHOOK_URL && WEBHOOK_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+        const data = {
+          cardCode: cardCode ? cardCode.toUpperCase() : null,
+          staffName: staffName || 'Unknown',
+          rating: rating,
+          timestamp: new Date().toISOString()
+        };
 
-    let seconds = 5;
-    const countEl = document.getElementById('count');
-    const interval = setInterval(() => {
-      seconds--;
-      if (seconds > 0) {
-        countEl.textContent = `En ${seconds} segundo${seconds === 1 ? '' : 's'} te redirigimos…`;
-      } else {
-        clearInterval(interval);
+        fetch(WEBHOOK_URL, {
+          redirect: "follow",
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          body: JSON.stringify(data)
+        }).then(response => {
+          console.log('Tracking successful:', response);
+        }).catch(err => {
+          console.error('Tracking error:', err);
+        });
       }
-    }, 1000);
+    }
 
-    setTimeout(() => {
-      window.location.href = REVIEW_URL;
-    }, 5000);
+    // Star rating functionality
+    const stars = document.querySelectorAll('.star');
+    const promptEl = document.querySelector('.prompt');
+
+    stars.forEach((star, index) => {
+      // Hover effect
+      star.addEventListener('mouseenter', () => {
+        stars.forEach((s, i) => {
+          if (i <= index) {
+            s.classList.add('active');
+          } else {
+            s.classList.remove('active');
+          }
+        });
+      });
+
+      // Click handler
+      star.addEventListener('click', () => {
+        const rating = parseInt(star.dataset.rating);
+
+        // Track the rating
+        trackCardScan(rating);
+
+        // Show feedback
+        promptEl.textContent = '¡Gracias por tu calificación!';
+
+        if (rating === 5) {
+          // 5 stars - redirect to Google Reviews
+          promptEl.textContent = '¡Excelente! Te llevamos a Google...';
+          setTimeout(() => {
+            window.location.href = REVIEW_URL;
+          }, 1000);
+        } else {
+          // 4 or below - redirect to feedback form
+          promptEl.textContent = 'Queremos mejorar, por favor cuéntanos más...';
+          setTimeout(() => {
+            // Pass the rating and staff info to the feedback form
+            const feedbackUrl = `feedback.html?rating=${rating}&card=${cardCode || ''}&staff=${encodeURIComponent(staffName || 'Unknown')}`;
+            window.location.href = feedbackUrl;
+          }, 1000);
+        }
+      });
+    });
+
+    // Reset stars when mouse leaves
+    document.querySelector('.stars').addEventListener('mouseleave', () => {
+      stars.forEach(s => s.classList.remove('active'));
+    });
   </script>
 </body>
 </html>
