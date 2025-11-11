@@ -236,11 +236,10 @@
         promptEl.textContent = '¡Gracias por tu calificación!';
 
         if (rating === 5) {
-          // 5 stars - redirect to Google Reviews
-          promptEl.textContent = '¡Excelente! Te llevamos a Google...';
+          // 5 stars - redirect to Google Reviews (silent redirect)
           setTimeout(() => {
             window.location.href = REVIEW_URL;
-          }, 1000);
+          }, 800);
         } else {
           // 4 or below - redirect to feedback form
           promptEl.textContent = 'Queremos mejorar, por favor cuéntanos más...';
