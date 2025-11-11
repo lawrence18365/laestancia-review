@@ -2,8 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes" />
   <title>La Estancia · Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antic+Didone&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
@@ -24,9 +27,11 @@
       justify-content: center;
       background: var(--bg);
       background-attachment: fixed;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       padding: 20px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
     .card {
       width: min(520px, 100%);
@@ -53,16 +58,20 @@
       background: rgba(0,0,0,0.3);
     }
     h1 {
-      font-size: 1.2rem;
-      letter-spacing: 0.03em;
-      margin-bottom: 0.45rem;
+      font-family: 'Antic Didone', serif;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.5rem;
+      font-weight: 400;
+      line-height: 1.4;
     }
     p.subtitle {
       margin-top: 0;
       color: var(--muted);
-      font-size: 0.85rem;
-      line-height: 1.5;
+      font-size: 0.9rem;
+      line-height: 1.6;
       margin-bottom: 1.5rem;
+      font-weight: 400;
     }
     .form-group {
       margin-bottom: 1.2rem;
@@ -74,6 +83,7 @@
       color: var(--gold);
       margin-bottom: 0.5rem;
       font-weight: 600;
+      letter-spacing: 0.02em;
     }
     input, textarea {
       width: 100%;
@@ -107,6 +117,8 @@
       cursor: pointer;
       transition: all 0.2s;
       margin-top: 1rem;
+      font-family: 'Montserrat', sans-serif;
+      letter-spacing: 0.02em;
     }
     button:hover {
       background: #f0d08c;
@@ -140,15 +152,48 @@
     small {
       display: block;
       margin-top: 1rem;
-      font-size: 0.7rem;
+      font-size: 0.75rem;
       color: rgba(245, 241, 234, 0.45);
+      font-weight: 400;
     }
     @media (max-width: 460px) {
       .card {
         padding: 24px 18px 20px;
       }
       h1 {
-        font-size: 1rem;
+        font-size: 1.15rem;
+        letter-spacing: 0.04em;
+      }
+      p.subtitle {
+        font-size: 0.85rem;
+      }
+      label {
+        font-size: 0.8rem;
+      }
+      input, textarea {
+        font-size: 0.85rem;
+        padding: 12px;
+      }
+      button {
+        font-size: 0.95rem;
+        padding: 13px;
+      }
+    }
+    @media (max-width: 380px) {
+      h1 {
+        font-size: 1.05rem;
+      }
+      p.subtitle {
+        font-size: 0.8rem;
+      }
+    }
+    /* Touch optimization for mobile forms */
+    @media (hover: none) and (pointer: coarse) {
+      input, textarea {
+        font-size: 16px; /* Prevents iOS zoom on focus */
+      }
+      button {
+        min-height: 48px; /* iOS touch target */
       }
     }
   </style>
