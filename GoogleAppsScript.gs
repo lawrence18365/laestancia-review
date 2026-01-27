@@ -23,6 +23,9 @@ const MANAGER_EMAIL = "lbarwe1@gmail.com"; // Manager email for notifications
 // Admin password for staff management (change this!)
 const ADMIN_PASSWORD = "laestancia2024";
 
+// Default minimum rating to redirect to Google (4 or 5)
+const DEFAULT_GOOGLE_THRESHOLD = 5;
+
 /**
  * Run this function ONCE to set up your sheets
  * Click the function name in the dropdown above, then click the Run button (▶)
@@ -68,6 +71,15 @@ function initializeSheet() {
   if (!staffSheet) {
     staffSheet = ss.insertSheet('Staff');
   }
+
+  // Get or create Settings sheet
+  let settingsSheet = ss.getSheetByName('Settings');
+  if (!settingsSheet) {
+    settingsSheet = ss.insertSheet('Settings');
+  }
+
+  // Setup Settings sheet
+  setupSettingsSheet(settingsSheet);
 
   // Setup Staff sheet FIRST (other sheets depend on it)
   setupStaffSheet(staffSheet);
@@ -559,6 +571,96 @@ function setupStaffSheet(sheet) {
 }
 
 /**
+ * Setup Settings sheet for configurable options
+ */
+function setupSettingsSheet(sheet) {
+  // Only setup if empty or missing
+  if (sheet.getLastRow() === 0 || sheet.getRange(1, 1).getValue() !== 'Setting') {
+    sheet.clear();
+
+    // Add headers
+    sheet.appendRow(['Setting', 'Value', 'Description']);
+
+    // Format header row
+    const headerRange = sheet.getRange(1, 1, 1, 3);
+    headerRange.setFontWeight('bold');
+    headerRange.setBackground('#1c1a18');
+    headerRange.setFontColor('#e6c07b');
+    headerRange.setHorizontalAlignment('center');
+
+    // Add default settings
+    sheet.appendRow(['googleThreshold', DEFAULT_GOOGLE_THRESHOLD, 'Minimum star rating to redirect to Google Reviews (4 or 5)']);
+    sheet.appendRow(['reviewUrl', 'https://g.page/r/Caz8tUjHvtOBEBM/review', 'Google Review URL']);
+
+    // Set column widths
+    sheet.setColumnWidth(1, 150);
+    sheet.setColumnWidth(2, 300);
+    sheet.setColumnWidth(3, 400);
+
+    sheet.setFrozenRows(1);
+  }
+}
+
+/**
+ * Get all settings
+ */
+function getSettings() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let settingsSheet = ss.getSheetByName('Settings');
+
+  // Default settings
+  const defaults = {
+    googleThreshold: DEFAULT_GOOGLE_THRESHOLD,
+    reviewUrl: 'https://g.page/r/Caz8tUjHvtOBEBM/review'
+  };
+
+  if (!settingsSheet || settingsSheet.getLastRow() <= 1) {
+    return defaults;
+  }
+
+  const data = settingsSheet.getDataRange().getValues();
+  const settings = { ...defaults };
+
+  // Skip header row
+  for (let i = 1; i < data.length; i++) {
+    const key = data[i][0];
+    const value = data[i][1];
+    if (key && value !== undefined && value !== '') {
+      settings[key] = value;
+    }
+  }
+
+  return settings;
+}
+
+/**
+ * Update a setting
+ */
+function updateSetting(key, value) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let settingsSheet = ss.getSheetByName('Settings');
+
+  if (!settingsSheet) {
+    settingsSheet = ss.insertSheet('Settings');
+    setupSettingsSheet(settingsSheet);
+  }
+
+  const data = settingsSheet.getDataRange().getValues();
+
+  // Find and update the setting
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === key) {
+      settingsSheet.getRange(i + 1, 2).setValue(value);
+      return { success: true, message: 'Setting updated' };
+    }
+  }
+
+  // Setting not found, add it
+  settingsSheet.appendRow([key, value, '']);
+  return { success: true, message: 'Setting added' };
+}
+
+/**
  * Get staff list from Staff sheet
  */
 function getStaffList() {
@@ -997,6 +1099,23 @@ function doGet(e) {
       case 'getStaff':
         // Get staff list for review page
         result = getStaffList();
+        break;
+
+      case 'getSettings':
+        // Get settings (includes threshold)
+        result = getSettings();
+        break;
+
+      case 'updateSetting':
+        // Update a setting
+        const settingPassword = e.parameter.password;
+        if (settingPassword !== ADMIN_PASSWORD) {
+          result = { success: false, message: 'Invalid password' };
+        } else {
+          const settingKey = e.parameter.key;
+          const settingValue = e.parameter.value;
+          result = updateSetting(settingKey, settingValue);
+        }
         break;
 
       case 'getAllStaff':

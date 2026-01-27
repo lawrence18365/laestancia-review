@@ -360,6 +360,22 @@
         </div>
       </div>
 
+      <!-- Settings Card -->
+      <div class="card">
+        <h2 class="card-title">Configuracion</h2>
+        <div id="settingsMessage" class="message hidden"></div>
+        <div class="form-group">
+          <label for="thresholdSelect">Calificacion minima para Google Reviews</label>
+          <select id="thresholdSelect" onchange="updateThreshold()">
+            <option value="5">Solo 5 estrellas van a Google</option>
+            <option value="4">4 y 5 estrellas van a Google</option>
+          </select>
+          <p style="font-size: 0.8rem; color: var(--muted); margin-top: 8px;">
+            Las calificaciones por debajo del umbral iran al formulario de feedback privado.
+          </p>
+        </div>
+      </div>
+
       <!-- Staff List Card -->
       <div class="card">
         <h2 class="card-title">Personal Actual</h2>
@@ -409,6 +425,9 @@
 
         // Render staff list
         renderStaffList(data);
+
+        // Load settings
+        loadSettings();
 
       } catch (error) {
         console.error('Login error:', error);
@@ -564,6 +583,48 @@
       } catch (error) {
         console.error('Delete error:', error);
         alert('Error de conexion');
+      }
+    }
+
+    async function loadSettings() {
+      try {
+        const response = await fetch(`${WEBHOOK_URL}?action=getSettings`);
+        const settings = await response.json();
+
+        if (settings && settings.googleThreshold) {
+          document.getElementById('thresholdSelect').value = settings.googleThreshold;
+        }
+      } catch (error) {
+        console.error('Error loading settings:', error);
+      }
+    }
+
+    async function updateThreshold() {
+      const threshold = document.getElementById('thresholdSelect').value;
+      const messageEl = document.getElementById('settingsMessage');
+
+      try {
+        const url = `${WEBHOOK_URL}?action=updateSetting&password=${encodeURIComponent(adminPassword)}&key=googleThreshold&value=${threshold}`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.success) {
+          messageEl.textContent = threshold === '5'
+            ? 'Solo 5 estrellas iran a Google Reviews'
+            : '4 y 5 estrellas iran a Google Reviews';
+          messageEl.className = 'message success';
+          messageEl.classList.remove('hidden');
+          setTimeout(() => messageEl.classList.add('hidden'), 3000);
+        } else {
+          messageEl.textContent = result.message || 'Error al guardar';
+          messageEl.className = 'message error';
+          messageEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Update setting error:', error);
+        messageEl.textContent = 'Error de conexion';
+        messageEl.className = 'message error';
+        messageEl.classList.remove('hidden');
       }
     }
   </script>

@@ -480,6 +480,57 @@
         justify-content: center;
       }
     }
+
+    /* TV/Display Mode */
+    body.tv-mode {
+      padding: 48px 60px;
+    }
+    body.tv-mode header {
+      margin-bottom: 40px;
+    }
+    body.tv-mode .logo {
+      width: 120px;
+    }
+    body.tv-mode h1 {
+      font-size: 2.2rem;
+    }
+    body.tv-mode .hero-card {
+      padding: 48px 32px;
+      margin-bottom: 48px;
+    }
+    body.tv-mode .hero-name {
+      font-size: 3rem;
+    }
+    body.tv-mode .hero-stats {
+      font-size: 1.2rem;
+    }
+    body.tv-mode .hero-label {
+      font-size: 0.9rem;
+    }
+    body.tv-mode .card {
+      padding: 32px;
+    }
+    body.tv-mode .card-title {
+      font-size: 1.4rem;
+      margin-bottom: 24px;
+    }
+    body.tv-mode .leaderboard-table td {
+      padding: 18px 12px;
+      font-size: 1.1rem;
+    }
+    body.tv-mode .leaderboard-table th {
+      font-size: 0.75rem;
+      padding: 14px 12px;
+    }
+    body.tv-mode .rank {
+      font-size: 1.3rem;
+    }
+    body.tv-mode .week-count {
+      font-size: 1.4rem;
+    }
+    body.tv-mode .week-info {
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -576,16 +627,34 @@
 
     function toggleTVMode() {
       tvMode = !tvMode;
+      document.body.classList.toggle('tv-mode', tvMode);
+
       if (tvMode) {
-        document.body.style.padding = '48px';
-        document.querySelector('header').style.marginBottom = '60px';
+        // Hide non-essential elements for TV display
+        document.querySelector('.header-actions').style.display = 'none';
+        document.querySelector('.protection-score').style.display = 'none';
+        document.querySelector('.stats-grid').style.display = 'none';
+        document.querySelectorAll('.main-grid .card')[1].style.display = 'none'; // Hide feedback
+
+        // Make leaderboard full width and larger
+        document.querySelector('.main-grid').style.gridTemplateColumns = '1fr';
+        document.querySelector('.leaderboard-table').style.fontSize = '1.1rem';
+
+        // Enter fullscreen
         if (document.documentElement.requestFullscreen) {
           document.documentElement.requestFullscreen();
         }
       } else {
-        document.body.style.padding = '24px';
-        document.querySelector('header').style.marginBottom = '40px';
-        if (document.exitFullscreen) {
+        // Restore all elements
+        document.querySelector('.header-actions').style.display = '';
+        document.querySelector('.protection-score').style.display = '';
+        document.querySelector('.stats-grid').style.display = '';
+        document.querySelectorAll('.main-grid .card')[1].style.display = '';
+        document.querySelector('.main-grid').style.gridTemplateColumns = '';
+        document.querySelector('.leaderboard-table').style.fontSize = '';
+
+        // Exit fullscreen
+        if (document.exitFullscreen && document.fullscreenElement) {
           document.exitFullscreen();
         }
       }

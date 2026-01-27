@@ -195,7 +195,12 @@
     // GOOGLE SHEETS TRACKING CONFIGURATION
     // ========================================
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwyr195W62NX2PXpFgw_X2Zoizd4PONAKYeKxlTMBT_LylAhGrKEf2PZoqyc8n0gMAoWg/exec";
-    const REVIEW_URL = "https://g.page/r/Caz8tUjHvtOBEBM/review";
+
+    // Settings (loaded from Google Sheet, with defaults)
+    let SETTINGS = {
+      googleThreshold: 5,  // Minimum rating to send to Google (4 or 5)
+      reviewUrl: "https://g.page/r/Caz8tUjHvtOBEBM/review"
+    };
 
     // Staff codes → names (loaded dynamically, with fallback)
     let STAFF = {
@@ -224,24 +229,30 @@
       msgEl.textContent = `Gracias por tu visita — ${staffName} te invita a compartir tu experiencia.`;
     }
 
-    // Load staff dynamically from Google Sheet (non-blocking)
-    // This updates the staff list for future lookups while keeping the page fast
+    // Load staff and settings dynamically from Google Sheet (non-blocking)
     fetch(WEBHOOK_URL + '?action=getStaff')
       .then(response => response.json())
       .then(data => {
         if (data && !data.error) {
           STAFF = data;
-          // Update staff name if we have a card code and staff was found in dynamic list
           if (cardCode && STAFF[cardCode.toUpperCase()]) {
             staffName = STAFF[cardCode.toUpperCase()];
             msgEl.textContent = `Gracias por tu visita — ${staffName} te invita a compartir tu experiencia.`;
           }
         }
       })
-      .catch(err => {
-        // Fail silently - fallback to hardcoded staff list
-        console.log('Using fallback staff list');
-      });
+      .catch(err => console.log('Using fallback staff list'));
+
+    // Load settings (threshold, review URL)
+    fetch(WEBHOOK_URL + '?action=getSettings')
+      .then(response => response.json())
+      .then(data => {
+        if (data && !data.error) {
+          SETTINGS = { ...SETTINGS, ...data };
+          console.log('Settings loaded:', SETTINGS);
+        }
+      })
+      .catch(err => console.log('Using default settings'));
 
     // Send tracking data to Google Sheets
     // CORS-compatible: Uses text/plain content type to avoid preflight requests
@@ -303,17 +314,18 @@
         // Show feedback
         promptEl.textContent = '¡Gracias por tu calificación!';
 
-        if (rating === 5) {
-          // 5 stars - redirect to Google Reviews (silent redirect)
+        // Check if rating meets threshold for Google Reviews
+        const threshold = parseInt(SETTINGS.googleThreshold) || 5;
+
+        if (rating >= threshold) {
+          // Meets threshold - redirect to Google Reviews
           setTimeout(() => {
-            window.location.href = REVIEW_URL;
+            window.location.href = SETTINGS.reviewUrl || "https://g.page/r/Caz8tUjHvtOBEBM/review";
           }, 800);
         } else {
-          // 4 or below - redirect to feedback form
+          // Below threshold - redirect to feedback form
           promptEl.textContent = 'Queremos mejorar, por favor cuéntanos más...';
           setTimeout(() => {
-            // Pass the rating and staff info to the feedback form
-            // Use current staffName value (may have been updated by dynamic fetch)
             const currentStaffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : 'Unknown';
             const feedbackUrl = `feedback.html?rating=${rating}&card=${cardCode || ''}&staff=${encodeURIComponent(currentStaffName)}`;
             window.location.href = feedbackUrl;
