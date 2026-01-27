@@ -814,6 +814,14 @@ function getDashboardData() {
   const thisWeekReviews = leaderboard.reduce((sum, s) => sum + s.thisWeek, 0);
   const pendingFeedback = feedbackData.filter(row => row[7] === 'New').length;
 
+  // Count 5-star ratings (sent to Google)
+  let fiveStarCount = 0;
+  for (let i = 1; i < rawData.length; i++) {
+    if (parseInt(rawData[i][3]) === 5) {
+      fiveStarCount++;
+    }
+  }
+
   return {
     leaderboard: leaderboard,
     recentFeedback: recentFeedback,
@@ -822,7 +830,8 @@ function getDashboardData() {
       thisWeekReviews: thisWeekReviews,
       pendingFeedback: pendingFeedback,
       activeStaff: staffNames.length,
-      weekStart: monday.toISOString()
+      weekStart: monday.toISOString(),
+      fiveStarCount: fiveStarCount
     }
   };
 }

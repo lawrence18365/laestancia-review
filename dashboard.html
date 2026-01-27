@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Antic+Didone&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
+      --bg: #0a0908;
+      --bg-gradient: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
       --card: rgba(12, 11, 10, 0.6);
       --border: rgba(255, 214, 142, 0.25);
       --gold: #e6c07b;
@@ -26,14 +27,20 @@
       margin: 0;
       padding: 0;
     }
+    html {
+      background: var(--bg);
+      overflow-x: hidden;
+    }
     body {
       min-height: 100vh;
-      background: var(--bg);
+      background: var(--bg-gradient);
       background-attachment: fixed;
       font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       padding: 20px;
       -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+      overflow-x: hidden;
     }
     .container {
       max-width: 1200px;
@@ -67,17 +74,71 @@
       color: var(--muted);
       font-size: 0.9rem;
     }
+
+    /* Staff of the Week Hero */
+    .hero-card {
+      background: linear-gradient(135deg, rgba(230,192,123,0.15), rgba(15,14,13,0.9));
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 25px;
+      text-align: center;
+      animation: rise 600ms ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(230,192,123,0.1) 0%, transparent 60%);
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%, 100% { transform: rotate(0deg); }
+      50% { transform: rotate(180deg); }
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+    .hero-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .hero-name {
+      font-family: 'Antic Didone', serif;
+      font-size: 2rem;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .hero-stats {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    .hero-badge {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+
+    /* Stats Grid */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
       margin-bottom: 25px;
     }
     .stat-card {
       background: linear-gradient(160deg, rgba(15,14,13,0.85), rgba(6,6,6,0.35));
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 20px;
+      padding: 18px 14px;
       text-align: center;
       backdrop-filter: blur(14px);
       animation: rise 600ms ease-out backwards;
@@ -86,21 +147,41 @@
     .stat-card:nth-child(2) { animation-delay: 150ms; }
     .stat-card:nth-child(3) { animation-delay: 200ms; }
     .stat-card:nth-child(4) { animation-delay: 250ms; }
+    .stat-card:nth-child(5) { animation-delay: 300ms; }
+    .stat-card:nth-child(6) { animation-delay: 350ms; }
+    .stat-card.highlight-green {
+      border-color: var(--green);
+      background: linear-gradient(160deg, rgba(76,175,80,0.15), rgba(6,6,6,0.35));
+    }
+    .stat-card.highlight-red {
+      border-color: var(--red);
+      background: linear-gradient(160deg, rgba(239,83,80,0.15), rgba(6,6,6,0.35));
+    }
     @keyframes rise {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
     .stat-value {
-      font-size: 2.5rem;
+      font-size: 2rem;
       font-weight: 700;
       color: var(--gold);
       line-height: 1.2;
     }
+    .stat-value.green { color: var(--green); }
+    .stat-value.red { color: var(--red); }
+    .stat-trend {
+      font-size: 0.8rem;
+      margin-left: 4px;
+    }
+    .stat-trend.up { color: var(--green); }
+    .stat-trend.down { color: var(--red); }
     .stat-label {
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: var(--muted);
       margin-top: 5px;
+      line-height: 1.3;
     }
+
     .main-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -119,7 +200,6 @@
       backdrop-filter: blur(14px);
       animation: rise 600ms ease-out backwards;
       animation-delay: 300ms;
-      min-height: 500px;
     }
     .card-title {
       font-family: 'Antic Didone', serif;
@@ -136,31 +216,45 @@
     }
     .leaderboard-table th {
       text-align: left;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      padding: 8px 10px;
+      padding: 8px 6px;
       border-bottom: 1px solid var(--border);
     }
     .leaderboard-table td {
-      padding: 12px 10px;
+      padding: 10px 6px;
       border-bottom: 1px solid rgba(255,255,255,0.05);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .leaderboard-table tr:last-child td {
       border-bottom: none;
     }
     .rank {
       font-weight: 700;
-      font-size: 1.1rem;
-      width: 40px;
+      font-size: 1rem;
+      width: 36px;
     }
     .rank-1 { color: #FFD700; }
     .rank-2 { color: var(--silver); }
     .rank-3 { color: var(--bronze); }
     .staff-name {
       font-weight: 600;
+    }
+    .staff-badge {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+    .badge-hot {
+      background: rgba(255,100,50,0.2);
+      color: #ff6432;
+    }
+    .badge-rising {
+      background: rgba(76,175,80,0.2);
+      color: var(--green);
     }
     .week-count {
       font-weight: 700;
@@ -174,7 +268,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      max-height: 600px;
+      max-height: 500px;
       overflow-y: auto;
     }
     .feedback-item {
@@ -205,16 +299,32 @@
     .feedback-meta {
       display: flex;
       justify-content: space-between;
-      margin-top: 8px;
+      align-items: center;
+      margin-top: 10px;
       font-size: 0.75rem;
       color: var(--muted);
+    }
+    .status-btn {
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
     }
     .status-new {
       background: rgba(239, 83, 80, 0.2);
       color: var(--red);
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-weight: 600;
+    }
+    .status-contacted {
+      background: rgba(255, 193, 7, 0.2);
+      color: #ffc107;
+    }
+    .status-resolved {
+      background: rgba(76, 175, 80, 0.2);
+      color: var(--green);
     }
     .loading {
       text-align: center;
@@ -233,6 +343,13 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+      flex-wrap: wrap;
+    }
     .refresh-btn {
       background: transparent;
       border: 1px solid var(--border);
@@ -247,12 +364,6 @@
     .refresh-btn:hover {
       background: rgba(230,192,123,0.1);
       border-color: var(--gold);
-    }
-    .header-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 15px;
     }
     .admin-btn {
       background: var(--gold);
@@ -271,6 +382,21 @@
       background: #f0d08c;
       transform: translateY(-1px);
     }
+    .tv-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .tv-btn:hover {
+      background: rgba(230,192,123,0.1);
+      color: var(--gold);
+    }
     .empty-state {
       text-align: center;
       padding: 30px;
@@ -281,12 +407,56 @@
       color: var(--muted);
       margin-bottom: 15px;
     }
+
+    /* Protection Score */
+    .protection-score {
+      background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(15,14,13,0.9));
+      border: 1px solid var(--green);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      animation: rise 600ms ease-out;
+    }
+    .protection-icon {
+      font-size: 2.5rem;
+    }
+    .protection-content {
+      flex: 1;
+    }
+    .protection-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+    .protection-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .protection-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
     @media (max-width: 600px) {
+      body { padding: 12px; }
       h1 { font-size: 1.4rem; }
-      .stat-value { font-size: 2rem; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .stat-value { font-size: 1.6rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .stat-card { padding: 14px 10px; }
+      .stat-label { font-size: 0.7rem; }
       .card { padding: 16px; }
-      .leaderboard-table td { padding: 10px 6px; font-size: 0.85rem; }
+      .leaderboard-table td { padding: 8px 4px; font-size: 0.8rem; }
+      .leaderboard-table th { font-size: 0.65rem; padding: 6px 4px; }
+      .hero-card { padding: 20px 16px; }
+      .hero-name { font-size: 1.5rem; }
+      .protection-score { flex-direction: column; text-align: center; gap: 12px; }
     }
   </style>
 </head>
@@ -303,13 +473,42 @@
       <div class="header-actions">
         <button class="refresh-btn" onclick="loadDashboard()">Actualizar</button>
         <a href="admin.html" class="admin-btn">Administrar Personal</a>
+        <button class="tv-btn" onclick="toggleTVMode()">Modo TV</button>
       </div>
     </header>
+
+    <!-- Staff of the Week -->
+    <div class="hero-card" id="heroCard" style="display:none;">
+      <div class="hero-content">
+        <div class="hero-badge">🏆</div>
+        <div class="hero-label">Lider de la Semana</div>
+        <div class="hero-name" id="heroName">-</div>
+        <div class="hero-stats" id="heroStats">-</div>
+      </div>
+    </div>
+
+    <!-- Protection Score -->
+    <div class="protection-score" id="protectionScore">
+      <div class="protection-icon">🛡️</div>
+      <div class="protection-content">
+        <div class="protection-title">Proteccion de Reputacion</div>
+        <div class="protection-value" id="protectionValue">-</div>
+        <div class="protection-desc" id="protectionDesc">Cargando...</div>
+      </div>
+    </div>
 
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card">
         <div class="stat-value" id="thisWeekTotal">-</div>
         <div class="stat-label">Resenas Esta Semana</div>
+      </div>
+      <div class="stat-card highlight-green">
+        <div class="stat-value green" id="googleReviews">-</div>
+        <div class="stat-label">Enviados a Google</div>
+      </div>
+      <div class="stat-card highlight-red">
+        <div class="stat-value red" id="problemsCaught">-</div>
+        <div class="stat-label">Problemas Capturados</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="totalReviews">-</div>
@@ -338,7 +537,7 @@
       </div>
 
       <div class="card">
-        <h2 class="card-title">Feedback Reciente</h2>
+        <h2 class="card-title">Problemas Capturados</h2>
         <div id="feedbackContainer">
           <div class="loading">
             <div class="spinner"></div>
@@ -352,6 +551,29 @@
   <script>
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwyr195W62NX2PXpFgw_X2Zoizd4PONAKYeKxlTMBT_LylAhGrKEf2PZoqyc8n0gMAoWg/exec";
 
+    let tvMode = false;
+
+    function toggleTVMode() {
+      tvMode = !tvMode;
+      if (tvMode) {
+        document.body.style.padding = '40px';
+        document.querySelector('header').style.marginBottom = '50px';
+        document.querySelector('.hero-card').style.transform = 'scale(1.1)';
+        document.querySelector('.tv-btn').textContent = 'Salir TV';
+        if (document.documentElement.requestFullscreen) {
+          document.documentElement.requestFullscreen();
+        }
+      } else {
+        document.body.style.padding = '20px';
+        document.querySelector('header').style.marginBottom = '30px';
+        document.querySelector('.hero-card').style.transform = 'scale(1)';
+        document.querySelector('.tv-btn').textContent = 'Modo TV';
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
     async function loadDashboard() {
       try {
         const response = await fetch(WEBHOOK_URL + '?action=getDashboard');
@@ -361,16 +583,41 @@
           throw new Error(data.error);
         }
 
+        // Calculate additional stats
+        const fiveStarCount = data.stats.fiveStarCount || 0;
+        const problemsCaught = data.stats.totalReviews - fiveStarCount;
+
         // Update stats
         document.getElementById('thisWeekTotal').textContent = data.stats.thisWeekReviews;
+        document.getElementById('googleReviews').textContent = fiveStarCount;
+        document.getElementById('problemsCaught').textContent = problemsCaught > 0 ? problemsCaught : 0;
         document.getElementById('totalReviews').textContent = data.stats.totalReviews;
         document.getElementById('activeStaff').textContent = data.stats.activeStaff;
         document.getElementById('pendingFeedback').textContent = data.stats.pendingFeedback;
+
+        // Protection score
+        const protectionRate = data.stats.totalReviews > 0
+          ? Math.round((fiveStarCount / data.stats.totalReviews) * 100)
+          : 100;
+        document.getElementById('protectionValue').textContent = protectionRate + '%';
+        document.getElementById('protectionDesc').textContent =
+          `${fiveStarCount} clientes felices enviados a Google · ${problemsCaught > 0 ? problemsCaught : 0} problemas manejados internamente`;
 
         // Update week info
         const weekStart = new Date(data.stats.weekStart);
         document.getElementById('weekInfo').textContent =
           `Semana del ${weekStart.toLocaleDateString('es-MX', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+
+        // Staff of the week (leader)
+        if (data.leaderboard && data.leaderboard.length > 0) {
+          const leader = data.leaderboard[0];
+          if (leader.thisWeek > 0) {
+            document.getElementById('heroCard').style.display = 'block';
+            document.getElementById('heroName').textContent = leader.name;
+            document.getElementById('heroStats').textContent =
+              `${leader.thisWeek} resenas esta semana · ${leader.avgRating || '-'} promedio`;
+          }
+        }
 
         // Render leaderboard
         renderLeaderboard(data.leaderboard);
@@ -401,7 +648,7 @@
             <tr>
               <th>#</th>
               <th>Nombre</th>
-              <th style="text-align:center">Semana</th>
+              <th style="text-align:center">Sem</th>
               <th style="text-align:center">Total</th>
               <th style="text-align:center">Prom</th>
             </tr>
@@ -412,12 +659,20 @@
       leaderboard.forEach((staff, index) => {
         const rank = index + 1;
         const rankClass = rank <= 3 ? `rank-${rank}` : '';
-        const medal = rank === 1 ? ' &#x1F947;' : rank === 2 ? ' &#x1F948;' : rank === 3 ? ' &#x1F949;' : '';
+        const medal = rank === 1 ? ' 🥇' : rank === 2 ? ' 🥈' : rank === 3 ? ' 🥉' : '';
+
+        // Badges
+        let badge = '';
+        if (staff.thisWeek >= 10) {
+          badge = '<span class="staff-badge badge-hot">🔥 Hot</span>';
+        } else if (staff.trend > 0.3) {
+          badge = '<span class="staff-badge badge-rising">↑</span>';
+        }
 
         html += `
           <tr>
             <td class="rank ${rankClass}">${rank}${medal}</td>
-            <td class="staff-name">${staff.name}</td>
+            <td class="staff-name">${staff.name}${badge}</td>
             <td class="week-count">${staff.thisWeek}</td>
             <td style="text-align:center">${staff.allTime}</td>
             <td class="avg-rating">${staff.avgRating || '-'}</td>
@@ -433,27 +688,29 @@
       const container = document.getElementById('feedbackContainer');
 
       if (!feedback || feedback.length === 0) {
-        container.innerHTML = '<div class="empty-state">No hay feedback reciente</div>';
+        container.innerHTML = '<div class="empty-state">No hay feedback reciente - eso es bueno!</div>';
         return;
       }
 
       let html = '<div class="feedback-list">';
 
-      feedback.forEach(item => {
-        const stars = '&#x2605;'.repeat(parseInt(item.rating) || 0);
-        const date = item.date || 'Fecha desconocida';
-        const statusClass = item.status === 'New' ? 'status-new' : '';
+      feedback.forEach((item, index) => {
+        const stars = '★'.repeat(parseInt(item.rating) || 0) + '☆'.repeat(5 - (parseInt(item.rating) || 0));
+        const statusClass = item.status === 'New' ? 'status-new' :
+                           item.status === 'Contacted' ? 'status-contacted' : 'status-resolved';
+        const statusText = item.status === 'New' ? 'Nuevo' :
+                          item.status === 'Contacted' ? 'Contactado' : 'Resuelto';
 
         html += `
           <div class="feedback-item">
             <div class="feedback-header">
-              <span class="feedback-rating">${stars} (${item.rating}/5)</span>
+              <span class="feedback-rating">${stars}</span>
               <span class="feedback-staff">${item.staffName || 'Desconocido'}</span>
             </div>
             <div class="feedback-text">"${item.feedback || 'Sin comentario'}"</div>
             <div class="feedback-meta">
-              <span>${item.customerName}</span>
-              <span class="${statusClass}">${item.status || 'Pendiente'}</span>
+              <span>${item.customerName || 'Anonimo'} · ${item.date || ''}</span>
+              <span class="status-btn ${statusClass}">${statusText}</span>
             </div>
           </div>
         `;
@@ -466,8 +723,8 @@
     // Load on page load
     loadDashboard();
 
-    // Auto-refresh every 5 minutes
-    setInterval(loadDashboard, 5 * 60 * 1000);
+    // Auto-refresh every 2 minutes
+    setInterval(loadDashboard, 2 * 60 * 1000);
   </script>
 </body>
 </html>
