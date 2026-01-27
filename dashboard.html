@@ -444,19 +444,84 @@
       margin-top: 4px;
     }
 
+    /* Tablet */
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+      .header-actions { gap: 8px; }
+      .admin-btn, .refresh-btn, .tv-btn { padding: 8px 14px; font-size: 0.8rem; }
+    }
+
+    /* Mobile */
     @media (max-width: 600px) {
-      body { padding: 12px; }
-      h1 { font-size: 1.4rem; }
-      .stat-value { font-size: 1.6rem; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-      .stat-card { padding: 14px 10px; }
-      .stat-label { font-size: 0.7rem; }
-      .card { padding: 16px; }
+      body { padding: 14px 12px; }
+      h1 { font-size: 1.3rem; }
+      .subtitle { font-size: 0.8rem; }
+      .logo { width: 80px; margin-bottom: 12px; }
+      .stat-value { font-size: 1.5rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .stat-card { padding: 12px 8px; border-radius: 12px; }
+      .stat-label { font-size: 0.65rem; line-height: 1.2; }
+      .card { padding: 16px 14px; border-radius: 14px; }
+      .card-title { font-size: 1rem; margin-bottom: 14px; }
       .leaderboard-table td { padding: 8px 4px; font-size: 0.8rem; }
-      .leaderboard-table th { font-size: 0.65rem; padding: 6px 4px; }
-      .hero-card { padding: 20px 16px; }
-      .hero-name { font-size: 1.5rem; }
-      .protection-score { flex-direction: column; text-align: center; gap: 12px; }
+      .leaderboard-table th { font-size: 0.6rem; padding: 6px 4px; }
+      .rank { font-size: 0.9rem; width: 32px; }
+      .staff-name { font-size: 0.8rem; }
+      .staff-badge { display: none; }
+      .week-count { font-size: 0.9rem; }
+      .hero-card { padding: 18px 14px; border-radius: 16px; margin-bottom: 18px; }
+      .hero-badge { font-size: 2.2rem; margin-bottom: 6px; }
+      .hero-label { font-size: 0.7rem; }
+      .hero-name { font-size: 1.4rem; }
+      .hero-stats { font-size: 0.8rem; }
+      .protection-score {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+        padding: 16px;
+        border-radius: 14px;
+        margin-bottom: 18px;
+      }
+      .protection-icon { font-size: 2rem; }
+      .protection-title { font-size: 0.7rem; }
+      .protection-value { font-size: 1.5rem; }
+      .protection-desc { font-size: 0.7rem; }
+      .header-actions { margin-top: 12px; }
+      .admin-btn { padding: 10px 16px; font-size: 0.8rem; }
+      .refresh-btn, .tv-btn { padding: 8px 12px; font-size: 0.75rem; }
+      .feedback-item { padding: 12px; }
+      .feedback-text { font-size: 0.8rem; }
+      .feedback-meta { font-size: 0.7rem; }
+      .main-grid { gap: 14px; }
+      .week-info { font-size: 0.7rem; margin-bottom: 12px; }
+    }
+
+    /* Small mobile */
+    @media (max-width: 380px) {
+      body { padding: 10px 8px; }
+      h1 { font-size: 1.15rem; }
+      .stat-value { font-size: 1.3rem; }
+      .stat-card { padding: 10px 6px; }
+      .stat-label { font-size: 0.6rem; }
+      .card { padding: 14px 10px; }
+      .leaderboard-table td { padding: 6px 2px; font-size: 0.75rem; }
+      .leaderboard-table th { font-size: 0.55rem; padding: 4px 2px; }
+      .rank { font-size: 0.8rem; width: 28px; }
+      .hero-name { font-size: 1.2rem; }
+      .protection-value { font-size: 1.3rem; }
+      .admin-btn { width: 100%; text-align: center; }
+      .header-actions { flex-direction: column; }
+      .refresh-btn, .tv-btn { width: 100%; }
+    }
+
+    /* Touch-friendly tap targets */
+    @media (hover: none) and (pointer: coarse) {
+      .refresh-btn, .tv-btn, .admin-btn, .status-btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
     }
   </style>
 </head>
