@@ -30,20 +30,22 @@ const ADMIN_PASSWORD = "laestancia2024";
 function initializeSheet() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  // Get Sheet1 for Raw Data
-  let rawDataSheet = ss.getSheets()[0]; // Sheet1
-  rawDataSheet.setName('Raw Data');
-
-  // Get or create Sheet2 for Leaderboard
-  let leaderboardSheet;
-  if (ss.getSheets().length < 2) {
-    leaderboardSheet = ss.insertSheet('Leaderboard');
-  } else {
-    leaderboardSheet = ss.getSheets()[1]; // Sheet2
-    leaderboardSheet.setName('Leaderboard');
+  // Get or create Raw Data sheet
+  let rawDataSheet = ss.getSheetByName('Raw Data');
+  if (!rawDataSheet) {
+    rawDataSheet = ss.getSheets()[0];
+    if (rawDataSheet.getName() !== 'Raw Data') {
+      rawDataSheet.setName('Raw Data');
+    }
   }
 
-  // Get or create Sheet3 for Feedback
+  // Get or create Leaderboard sheet
+  let leaderboardSheet = ss.getSheetByName('Leaderboard');
+  if (!leaderboardSheet) {
+    leaderboardSheet = ss.insertSheet('Leaderboard');
+  }
+
+  // Get or create Feedback sheet
   let feedbackSheet = ss.getSheetByName('Feedback');
   if (!feedbackSheet) {
     feedbackSheet = ss.insertSheet('Feedback');
