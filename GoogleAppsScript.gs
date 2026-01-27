@@ -67,6 +67,9 @@ function initializeSheet() {
     staffSheet = ss.insertSheet('Staff');
   }
 
+  // Setup Staff sheet FIRST (other sheets depend on it)
+  setupStaffSheet(staffSheet);
+
   // Setup Raw Data sheet
   setupRawDataSheet(rawDataSheet);
 
@@ -81,9 +84,6 @@ function initializeSheet() {
 
   // Setup All-Time Stats sheet
   setupAllTimeStatsSheet(allTimeStatsSheet, rawDataSheet);
-
-  // Setup Staff sheet
-  setupStaffSheet(staffSheet);
 
   // Make Leaderboard the active sheet
   ss.setActiveSheet(leaderboardSheet);
@@ -563,22 +563,25 @@ function getStaffList() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let staffSheet = ss.getSheetByName('Staff');
 
-  // If no Staff sheet exists, return hardcoded fallback
-  if (!staffSheet) {
-    return {
-      "EDUARDO001": "Eduardo",
-      "PEDROLOPEZ002": "Pedro López",
-      "PEDROOROCIO003": "Pedro Orocio",
-      "EMILIANO004": "Emiliano",
-      "DAVID005": "David",
-      "LEOGASCA006": "Leo Gasca",
-      "LEOREYNOSO007": "Leo Reynoso",
-      "ULISES008": "Ulises",
-      "GERARDO009": "Gerardo",
-      "CARLOS010": "Carlos",
-      "JULIO011": "Julio",
-      "FERNANDO012": "Fernando"
-    };
+  // Hardcoded fallback list
+  const fallbackStaff = {
+    "EDUARDO001": "Eduardo",
+    "PEDROLOPEZ002": "Pedro López",
+    "PEDROOROCIO003": "Pedro Orocio",
+    "EMILIANO004": "Emiliano",
+    "DAVID005": "David",
+    "LEOGASCA006": "Leo Gasca",
+    "LEOREYNOSO007": "Leo Reynoso",
+    "ULISES008": "Ulises",
+    "GERARDO009": "Gerardo",
+    "CARLOS010": "Carlos",
+    "JULIO011": "Julio",
+    "FERNANDO012": "Fernando"
+  };
+
+  // If no Staff sheet exists or it's empty, return fallback
+  if (!staffSheet || staffSheet.getLastRow() <= 1) {
+    return fallbackStaff;
   }
 
   const data = staffSheet.getDataRange().getValues();
@@ -593,6 +596,11 @@ function getStaffList() {
     if (code && name && active === 'Yes') {
       staffMap[code.toUpperCase()] = name;
     }
+  }
+
+  // If no active staff found, return fallback
+  if (Object.keys(staffMap).length === 0) {
+    return fallbackStaff;
   }
 
   return staffMap;
