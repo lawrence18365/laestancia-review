@@ -541,18 +541,18 @@
         alt="La Estancia"
         class="logo"
       />
-      <h1>Performance Dashboard</h1>
-      <p class="subtitle">Real-time team analytics and customer insights</p>
+      <h1>Panel de Rendimiento</h1>
+      <p class="subtitle">Analíticas del equipo en tiempo real</p>
       <div class="header-actions">
-        <button class="btn" onclick="loadDashboard()">Refresh</button>
-        <a href="admin.html" class="btn btn-primary">Manage Staff</a>
-        <button class="btn" onclick="toggleTVMode()">Display Mode</button>
+        <button class="btn" onclick="loadDashboard()">Actualizar</button>
+        <a href="admin.html" class="btn btn-primary">Gestionar Personal</a>
+        <button class="btn" onclick="toggleTVMode()">Modo TV</button>
       </div>
     </header>
 
     <!-- Staff of the Week -->
     <div class="hero-card" id="heroCard" style="display:none;">
-      <div class="hero-label">Leader of the Week</div>
+      <div class="hero-label">Líder de la Semana</div>
       <div class="hero-name" id="heroName">-</div>
       <div class="hero-stats" id="heroStats">-</div>
     </div>
@@ -563,57 +563,57 @@
         <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
       <div class="protection-content">
-        <div class="protection-title">Reputation Protection</div>
+        <div class="protection-title">Protección de Reputación</div>
         <div class="protection-value" id="protectionValue">-</div>
-        <div class="protection-desc" id="protectionDesc">Loading...</div>
+        <div class="protection-desc" id="protectionDesc">Cargando...</div>
       </div>
     </div>
 
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card">
         <div class="stat-value" id="thisWeekTotal">-</div>
-        <div class="stat-label">This Week</div>
+        <div class="stat-label">Esta Semana</div>
       </div>
       <div class="stat-card highlight-green">
         <div class="stat-value green" id="googleReviews">-</div>
-        <div class="stat-label">Sent to Google</div>
+        <div class="stat-label">Enviados a Google</div>
       </div>
       <div class="stat-card highlight-red">
         <div class="stat-value red" id="problemsCaught">-</div>
-        <div class="stat-label">Issues Caught</div>
+        <div class="stat-label">Problemas Capturados</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="totalReviews">-</div>
-        <div class="stat-label">All Time</div>
+        <div class="stat-label">Total Histórico</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="activeStaff">-</div>
-        <div class="stat-label">Active Staff</div>
+        <div class="stat-label">Personal Activo</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="pendingFeedback">-</div>
-        <div class="stat-label">Pending Review</div>
+        <div class="stat-label">Pendientes</div>
       </div>
     </div>
 
     <div class="main-grid">
       <div class="card">
-        <h2 class="card-title">Leaderboard</h2>
-        <p class="week-info" id="weekInfo">Loading...</p>
+        <h2 class="card-title">Clasificación</h2>
+        <p class="week-info" id="weekInfo">Cargando...</p>
         <div id="leaderboardContainer">
           <div class="loading">
             <div class="spinner"></div>
-            Loading data...
+            Cargando datos...
           </div>
         </div>
       </div>
 
       <div class="card">
-        <h2 class="card-title">Issues Captured</h2>
+        <h2 class="card-title">Feedback Recibido</h2>
         <div id="feedbackContainer">
           <div class="loading">
             <div class="spinner"></div>
-            Loading feedback...
+            Cargando feedback...
           </div>
         </div>
       </div>
@@ -684,11 +684,11 @@
           : 100;
         document.getElementById('protectionValue').textContent = protectionRate + '%';
         document.getElementById('protectionDesc').textContent =
-          `${fiveStarCount} satisfied customers directed to Google Reviews · ${problemsCaught > 0 ? problemsCaught : 0} issues handled privately`;
+          `${fiveStarCount} clientes satisfechos enviados a Google · ${problemsCaught > 0 ? problemsCaught : 0} problemas manejados en privado`;
 
         const weekStart = new Date(data.stats.weekStart);
         document.getElementById('weekInfo').textContent =
-          `Week of ${weekStart.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+          `Semana del ${weekStart.toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })}`;
 
         if (data.leaderboard && data.leaderboard.length > 0) {
           const leader = data.leaderboard[0];
@@ -696,7 +696,7 @@
             document.getElementById('heroCard').style.display = 'block';
             document.getElementById('heroName').textContent = leader.name;
             document.getElementById('heroStats').textContent =
-              `${leader.thisWeek} reviews this week · ${leader.avgRating || '-'} average rating`;
+              `${leader.thisWeek} reseñas esta semana · ${leader.avgRating || '-'} calificación promedio`;
           }
         }
 
@@ -706,9 +706,9 @@
       } catch (error) {
         console.error('Error loading dashboard:', error);
         document.getElementById('leaderboardContainer').innerHTML =
-          '<div class="empty-state">Unable to load data. Please refresh.</div>';
+          '<div class="empty-state">Error al cargar datos. Por favor actualiza.</div>';
         document.getElementById('feedbackContainer').innerHTML =
-          '<div class="empty-state">Unable to load feedback.</div>';
+          '<div class="empty-state">Error al cargar feedback.</div>';
       }
     }
 
@@ -716,7 +716,7 @@
       const container = document.getElementById('leaderboardContainer');
 
       if (!leaderboard || leaderboard.length === 0) {
-        container.innerHTML = '<div class="empty-state">No data this week</div>';
+        container.innerHTML = '<div class="empty-state">Sin datos esta semana</div>';
         return;
       }
 
@@ -725,10 +725,10 @@
           <thead>
             <tr>
               <th>#</th>
-              <th>Name</th>
-              <th style="text-align:center">Week</th>
+              <th>Nombre</th>
+              <th style="text-align:center">Semana</th>
               <th style="text-align:center">Total</th>
-              <th style="text-align:center">Avg</th>
+              <th style="text-align:center">Prom</th>
             </tr>
           </thead>
           <tbody>
@@ -757,7 +757,7 @@
       const container = document.getElementById('feedbackContainer');
 
       if (!feedback || feedback.length === 0) {
-        container.innerHTML = '<div class="empty-state">No issues to review</div>';
+        container.innerHTML = '<div class="empty-state">Sin problemas por revisar</div>';
         return;
       }
 
@@ -767,18 +767,18 @@
         const stars = '★'.repeat(parseInt(item.rating) || 0) + '☆'.repeat(5 - (parseInt(item.rating) || 0));
         const statusClass = item.status === 'New' ? 'status-new' :
                            item.status === 'Contacted' ? 'status-contacted' : 'status-resolved';
-        const statusText = item.status === 'New' ? 'New' :
-                          item.status === 'Contacted' ? 'Contacted' : 'Resolved';
+        const statusText = item.status === 'New' ? 'Nuevo' :
+                          item.status === 'Contacted' ? 'Contactado' : 'Resuelto';
 
         html += `
           <div class="feedback-item">
             <div class="feedback-header">
               <span class="feedback-rating">${stars}</span>
-              <span class="feedback-staff">${item.staffName || 'Unknown'}</span>
+              <span class="feedback-staff">${item.staffName || 'Desconocido'}</span>
             </div>
-            <div class="feedback-text">"${item.feedback || 'No comment provided'}"</div>
+            <div class="feedback-text">"${item.feedback || 'Sin comentario'}"</div>
             <div class="feedback-meta">
-              <span>${item.customerName || 'Anonymous'} · ${item.date || ''}</span>
+              <span>${item.customerName || 'Anónimo'} · ${item.date || ''}</span>
               <span class="status-badge ${statusClass}">${statusText}</span>
             </div>
           </div>
