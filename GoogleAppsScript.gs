@@ -815,9 +815,13 @@ function getDashboardData() {
   const pendingFeedback = feedbackData.filter(row => row[7] === 'New').length;
 
   // Count 5-star ratings (sent to Google)
+  // Old data may not have ratings - if rating is empty/N/A, assume 5-star (went to Google)
   let fiveStarCount = 0;
   for (let i = 1; i < rawData.length; i++) {
-    if (parseInt(rawData[i][3]) === 5) {
+    const rating = rawData[i][3];
+    const ratingNum = parseInt(rating);
+    // Count as 5-star if: explicitly 5, or no rating data (old records went to Google)
+    if (ratingNum === 5 || !rating || rating === 'N/A' || rating === '' || isNaN(ratingNum)) {
       fiveStarCount++;
     }
   }
