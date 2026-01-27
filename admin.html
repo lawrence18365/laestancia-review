@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes" />
+  <title>La Estancia · Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antic+Didone&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
+      --card: rgba(12, 11, 10, 0.6);
+      --border: rgba(255, 214, 142, 0.25);
+      --gold: #e6c07b;
+      --text: #f5f1ea;
+      --muted: rgba(245, 241, 234, 0.7);
+      --green: #4CAF50;
+      --red: #ef5350;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-attachment: fixed;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .logo {
+      width: 80px;
+      height: auto;
+      border-radius: 999px;
+      border: 1px solid rgba(230,192,123,0.28);
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-family: 'Antic Didone', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .back-link {
+      color: var(--gold);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-top: 15px;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+    .back-link:hover {
+      border-bottom-color: var(--gold);
+    }
+    .card {
+      background: linear-gradient(160deg, rgba(15,14,13,0.85), rgba(6,6,6,0.35));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      backdrop-filter: blur(14px);
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-family: 'Antic Didone', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    /* Login Form */
+    .login-form {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    label {
+      display: block;
+      font-size: 0.85rem;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(230,192,123,0.3);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(0,0,0,0.5);
+    }
+    button {
+      padding: 12px 24px;
+      background: var(--gold);
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    button:hover {
+      background: #f0d08c;
+      transform: translateY(-1px);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--gold);
+    }
+    button.secondary:hover {
+      background: rgba(230,192,123,0.1);
+      border-color: var(--gold);
+    }
+    button.danger {
+      background: var(--red);
+      color: white;
+    }
+    button.danger:hover {
+      background: #ff6659;
+    }
+    .btn-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+    }
+    /* Staff List */
+    .staff-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .staff-item {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .staff-item:hover {
+      border-color: var(--border);
+    }
+    .staff-item.inactive {
+      opacity: 0.5;
+    }
+    .staff-info {
+      flex: 1;
+    }
+    .staff-name {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    .staff-code {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: monospace;
+      margin-top: 2px;
+    }
+    .staff-status {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: 10px;
+    }
+    .staff-status.active {
+      background: rgba(76, 175, 80, 0.2);
+      color: var(--green);
+    }
+    .staff-status.inactive {
+      background: rgba(239, 83, 80, 0.2);
+      color: var(--red);
+    }
+    .staff-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .staff-actions button {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+    /* Add Staff Form */
+    .add-staff-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+    @media (max-width: 600px) {
+      .add-staff-form {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Messages */
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+    .message.success {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid rgba(76, 175, 80, 0.4);
+      color: var(--green);
+    }
+    .message.error {
+      background: rgba(239, 83, 80, 0.2);
+      border: 1px solid rgba(239, 83, 80, 0.4);
+      color: var(--red);
+    }
+    .hidden {
+      display: none !important;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .nfc-info {
+      background: rgba(230,192,123,0.1);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .nfc-info h3 {
+      font-size: 0.95rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .nfc-info p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .nfc-url {
+      background: rgba(0,0,0,0.4);
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      word-break: break-all;
+      margin-top: 10px;
+      color: var(--text);
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.4rem; }
+      .staff-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+      .staff-actions { width: 100%; }
+      .staff-actions button { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img
+        src="https://i.postimg.cc/9fNDSz30/ac9a437c-35df-4b6e-9baa-8d08558366de.jpg"
+        alt="La Estancia"
+        class="logo"
+      />
+      <h1>Panel de Administracion</h1>
+      <p class="subtitle">Gestiona el personal de La Estancia</p>
+      <a href="dashboard.html" class="back-link">&larr; Volver al Dashboard</a>
+    </header>
+
+    <!-- Login Section -->
+    <div id="loginSection" class="card">
+      <h2 class="card-title">Acceso Administrativo</h2>
+      <div class="login-form">
+        <div class="form-group">
+          <label for="password">Contrasena de Administrador</label>
+          <input type="password" id="password" placeholder="Ingresa la contrasena">
+        </div>
+        <button onclick="login()">Acceder</button>
+        <div id="loginMessage" class="message error hidden"></div>
+      </div>
+    </div>
+
+    <!-- Admin Section (hidden until login) -->
+    <div id="adminSection" class="hidden">
+      <!-- Add Staff Card -->
+      <div class="card">
+        <h2 class="card-title">Agregar Nuevo Personal</h2>
+        <div id="addMessage" class="message hidden"></div>
+        <div class="add-staff-form">
+          <div class="form-group">
+            <label for="newCode">Codigo (para NFC)</label>
+            <input type="text" id="newCode" placeholder="Ej: MARIA013" style="text-transform: uppercase;">
+          </div>
+          <div class="form-group">
+            <label for="newName">Nombre Completo</label>
+            <input type="text" id="newName" placeholder="Ej: Maria Garcia">
+          </div>
+          <button onclick="addStaff()">Agregar</button>
+        </div>
+
+        <div class="nfc-info">
+          <h3>Como configurar la tarjeta NFC</h3>
+          <p>Despues de agregar al personal, programa su tarjeta NFC con esta URL:</p>
+          <div class="nfc-url" id="nfcUrlPreview">
+            https://[tu-dominio]/review.html?card=CODIGO
+          </div>
+          <p style="margin-top: 10px;">Reemplaza CODIGO con el codigo del empleado (ej: MARIA013)</p>
+        </div>
+      </div>
+
+      <!-- Staff List Card -->
+      <div class="card">
+        <h2 class="card-title">Personal Actual</h2>
+        <div id="staffListContainer">
+          <div class="loading">
+            <div class="spinner"></div>
+            Cargando personal...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwtA_7AzGxpxENgdewVEmI52JLwNV41kHP9LMuNe3lcKBCkdWJSIwjiv9GODGvFG0iC/exec";
+    let adminPassword = '';
+
+    // Get base URL for NFC preview
+    const baseUrl = window.location.href.replace('admin.html', 'review.html');
+    document.getElementById('nfcUrlPreview').textContent = baseUrl + '?card=CODIGO';
+
+    async function login() {
+      const password = document.getElementById('password').value;
+      const messageEl = document.getElementById('loginMessage');
+
+      if (!password) {
+        messageEl.textContent = 'Ingresa la contrasena';
+        messageEl.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        // Test password by trying to get staff list
+        const response = await fetch(`${WEBHOOK_URL}?action=getAllStaff&password=${encodeURIComponent(password)}`);
+        const data = await response.json();
+
+        if (data.error === 'Invalid password') {
+          messageEl.textContent = 'Contrasena incorrecta';
+          messageEl.classList.remove('hidden');
+          return;
+        }
+
+        // Success - save password and show admin section
+        adminPassword = password;
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('adminSection').classList.remove('hidden');
+
+        // Render staff list
+        renderStaffList(data);
+
+      } catch (error) {
+        console.error('Login error:', error);
+        messageEl.textContent = 'Error de conexion. Intenta de nuevo.';
+        messageEl.classList.remove('hidden');
+      }
+    }
+
+    // Allow Enter key to submit password
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') login();
+    });
+
+    async function loadStaffList() {
+      try {
+        const response = await fetch(`${WEBHOOK_URL}?action=getAllStaff&password=${encodeURIComponent(adminPassword)}`);
+        const data = await response.json();
+        renderStaffList(data);
+      } catch (error) {
+        console.error('Error loading staff:', error);
+        document.getElementById('staffListContainer').innerHTML =
+          '<div class="message error">Error al cargar personal</div>';
+      }
+    }
+
+    function renderStaffList(staffList) {
+      const container = document.getElementById('staffListContainer');
+
+      if (!staffList || staffList.length === 0) {
+        container.innerHTML = '<p style="color: var(--muted); text-align: center;">No hay personal registrado</p>';
+        return;
+      }
+
+      let html = '<div class="staff-list">';
+
+      staffList.forEach(staff => {
+        const statusClass = staff.active ? 'active' : 'inactive';
+        const statusText = staff.active ? 'Activo' : 'Inactivo';
+        const itemClass = staff.active ? '' : 'inactive';
+        const toggleText = staff.active ? 'Desactivar' : 'Activar';
+
+        html += `
+          <div class="staff-item ${itemClass}">
+            <div class="staff-info">
+              <div class="staff-name">
+                ${staff.name}
+                <span class="staff-status ${statusClass}">${statusText}</span>
+              </div>
+              <div class="staff-code">${staff.code}</div>
+            </div>
+            <div class="staff-actions">
+              <button class="secondary" onclick="toggleStaff('${staff.code}', '${staff.name}', ${!staff.active})">
+                ${toggleText}
+              </button>
+              <button class="danger" onclick="deleteStaff('${staff.code}', '${staff.name}')">
+                Eliminar
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    async function addStaff() {
+      const code = document.getElementById('newCode').value.trim().toUpperCase();
+      const name = document.getElementById('newName').value.trim();
+      const messageEl = document.getElementById('addMessage');
+
+      if (!code || !name) {
+        messageEl.textContent = 'Codigo y nombre son requeridos';
+        messageEl.className = 'message error';
+        messageEl.classList.remove('hidden');
+        return;
+      }
+
+      // Validate code format (letters and numbers only)
+      if (!/^[A-Z0-9]+$/.test(code)) {
+        messageEl.textContent = 'El codigo solo puede contener letras y numeros';
+        messageEl.className = 'message error';
+        messageEl.classList.remove('hidden');
+        return;
+      }
+
+      try {
+        const url = `${WEBHOOK_URL}?action=addStaff&password=${encodeURIComponent(adminPassword)}&code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.success) {
+          messageEl.textContent = `${name} agregado exitosamente. URL para NFC: ${baseUrl}?card=${code}`;
+          messageEl.className = 'message success';
+          messageEl.classList.remove('hidden');
+
+          // Clear form
+          document.getElementById('newCode').value = '';
+          document.getElementById('newName').value = '';
+
+          // Reload staff list
+          loadStaffList();
+        } else {
+          messageEl.textContent = result.message || 'Error al agregar personal';
+          messageEl.className = 'message error';
+          messageEl.classList.remove('hidden');
+        }
+      } catch (error) {
+        console.error('Add staff error:', error);
+        messageEl.textContent = 'Error de conexion';
+        messageEl.className = 'message error';
+        messageEl.classList.remove('hidden');
+      }
+    }
+
+    async function toggleStaff(code, name, newActive) {
+      const action = newActive ? 'activar' : 'desactivar';
+      if (!confirm(`¿Seguro que quieres ${action} a ${name}?`)) {
+        return;
+      }
+
+      try {
+        const url = `${WEBHOOK_URL}?action=updateStaff&password=${encodeURIComponent(adminPassword)}&code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}&active=${newActive}`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.success) {
+          loadStaffList();
+        } else {
+          alert(result.message || 'Error al actualizar');
+        }
+      } catch (error) {
+        console.error('Toggle error:', error);
+        alert('Error de conexion');
+      }
+    }
+
+    async function deleteStaff(code, name) {
+      if (!confirm(`¿Seguro que quieres ELIMINAR permanentemente a ${name}?\n\nEsta accion no se puede deshacer. Sus datos historicos se mantendran.`)) {
+        return;
+      }
+
+      try {
+        const url = `${WEBHOOK_URL}?action=deleteStaff&password=${encodeURIComponent(adminPassword)}&code=${encodeURIComponent(code)}`;
+        const response = await fetch(url);
+        const result = await response.json();
+
+        if (result.success) {
+          loadStaffList();
+        } else {
+          alert(result.message || 'Error al eliminar');
+        }
+      } catch (error) {
+        console.error('Delete error:', error);
+        alert('Error de conexion');
+      }
+    }
+  </script>
+</body>
+</html>

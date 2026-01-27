@@ -190,8 +190,8 @@
     const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwtA_7AzGxpxENgdewVEmI52JLwNV41kHP9LMuNe3lcKBCkdWJSIwjiv9GODGvFG0iC/exec";
     const REVIEW_URL = "https://g.page/r/Caz8tUjHvtOBEBM/review";
 
-    // Staff codes → names
-    const STAFF = {
+    // Staff codes → names (loaded dynamically, with fallback)
+    let STAFF = {
       "EDUARDO001": "Eduardo",
       "PEDROLOPEZ002": "Pedro López",
       "PEDROOROCIO003": "Pedro Orocio",
@@ -209,7 +209,7 @@
     // Read ?card= from URL
     const params = new URLSearchParams(window.location.search);
     const cardCode = params.get('card');
-    const staffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : null;
+    let staffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : null;
 
     // Update personalized message
     const msgEl = document.getElementById('msg');
@@ -217,13 +217,34 @@
       msgEl.textContent = `Gracias por tu visita — ${staffName} te invita a compartir tu experiencia.`;
     }
 
+    // Load staff dynamically from Google Sheet (non-blocking)
+    // This updates the staff list for future lookups while keeping the page fast
+    fetch(WEBHOOK_URL + '?action=getStaff')
+      .then(response => response.json())
+      .then(data => {
+        if (data && !data.error) {
+          STAFF = data;
+          // Update staff name if we have a card code and staff was found in dynamic list
+          if (cardCode && STAFF[cardCode.toUpperCase()]) {
+            staffName = STAFF[cardCode.toUpperCase()];
+            msgEl.textContent = `Gracias por tu visita — ${staffName} te invita a compartir tu experiencia.`;
+          }
+        }
+      })
+      .catch(err => {
+        // Fail silently - fallback to hardcoded staff list
+        console.log('Using fallback staff list');
+      });
+
     // Send tracking data to Google Sheets
     // CORS-compatible: Uses text/plain content type to avoid preflight requests
     function trackCardScan(rating) {
       if (WEBHOOK_URL && WEBHOOK_URL !== "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE") {
+        // Use current staffName from STAFF object (may have been updated dynamically)
+        const currentStaffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : 'Unknown';
         const data = {
           cardCode: cardCode ? cardCode.toUpperCase() : null,
-          staffName: staffName || 'Unknown',
+          staffName: currentStaffName,
           rating: rating,
           timestamp: new Date().toISOString()
         };
@@ -285,7 +306,9 @@
           promptEl.textContent = 'Queremos mejorar, por favor cuéntanos más...';
           setTimeout(() => {
             // Pass the rating and staff info to the feedback form
-            const feedbackUrl = `feedback.html?rating=${rating}&card=${cardCode || ''}&staff=${encodeURIComponent(staffName || 'Unknown')}`;
+            // Use current staffName value (may have been updated by dynamic fetch)
+            const currentStaffName = cardCode && STAFF[cardCode.toUpperCase()] ? STAFF[cardCode.toUpperCase()] : 'Unknown';
+            const feedbackUrl = `feedback.html?rating=${rating}&card=${cardCode || ''}&staff=${encodeURIComponent(currentStaffName)}`;
             window.location.href = feedbackUrl;
           }, 1000);
         }

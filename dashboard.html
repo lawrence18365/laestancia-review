@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes" />
+  <title>La Estancia · Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Antic+Didone&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: radial-gradient(circle at top, #1c1a18 0%, #0e0d0c 55%, #050505 100%);
+      --card: rgba(12, 11, 10, 0.6);
+      --border: rgba(255, 214, 142, 0.25);
+      --gold: #e6c07b;
+      --gold-dim: rgba(230, 192, 123, 0.6);
+      --text: #f5f1ea;
+      --muted: rgba(245, 241, 234, 0.7);
+      --green: #4CAF50;
+      --red: #ef5350;
+      --silver: #C0C0C0;
+      --bronze: #CD7F32;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      background-attachment: fixed;
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      padding: 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      animation: fadeIn 600ms ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo {
+      width: 100px;
+      height: auto;
+      border-radius: 999px;
+      border: 1px solid rgba(230,192,123,0.28);
+      margin-bottom: 15px;
+    }
+    h1 {
+      font-family: 'Antic Didone', serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      letter-spacing: 0.05em;
+      color: var(--gold);
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .stat-card {
+      background: linear-gradient(160deg, rgba(15,14,13,0.85), rgba(6,6,6,0.35));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      backdrop-filter: blur(14px);
+      animation: rise 600ms ease-out backwards;
+    }
+    .stat-card:nth-child(1) { animation-delay: 100ms; }
+    .stat-card:nth-child(2) { animation-delay: 150ms; }
+    .stat-card:nth-child(3) { animation-delay: 200ms; }
+    .stat-card:nth-child(4) { animation-delay: 250ms; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1.2;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 5px;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .card {
+      background: linear-gradient(160deg, rgba(15,14,13,0.85), rgba(6,6,6,0.35));
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      backdrop-filter: blur(14px);
+      animation: rise 600ms ease-out backwards;
+      animation-delay: 300ms;
+    }
+    .card-title {
+      font-family: 'Antic Didone', serif;
+      font-size: 1.2rem;
+      color: var(--gold);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .leaderboard-table th {
+      text-align: left;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .leaderboard-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.9rem;
+    }
+    .leaderboard-table tr:last-child td {
+      border-bottom: none;
+    }
+    .rank {
+      font-weight: 700;
+      font-size: 1.1rem;
+      width: 40px;
+    }
+    .rank-1 { color: #FFD700; }
+    .rank-2 { color: var(--silver); }
+    .rank-3 { color: var(--bronze); }
+    .staff-name {
+      font-weight: 600;
+    }
+    .week-count {
+      font-weight: 700;
+      color: var(--gold);
+      text-align: center;
+    }
+    .avg-rating {
+      text-align: center;
+    }
+    .feedback-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .feedback-item {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .feedback-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .feedback-rating {
+      color: var(--gold);
+      font-size: 0.9rem;
+    }
+    .feedback-staff {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .feedback-text {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+    .feedback-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .status-new {
+      background: rgba(239, 83, 80, 0.2);
+      color: var(--red);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .refresh-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--gold);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .refresh-btn:hover {
+      background: rgba(230,192,123,0.1);
+      border-color: var(--gold);
+    }
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .admin-btn {
+      background: var(--gold);
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    .admin-btn:hover {
+      background: #f0d08c;
+      transform: translateY(-1px);
+    }
+    .empty-state {
+      text-align: center;
+      padding: 30px;
+      color: var(--muted);
+    }
+    .week-info {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 15px;
+    }
+    @media (max-width: 600px) {
+      h1 { font-size: 1.4rem; }
+      .stat-value { font-size: 2rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .card { padding: 16px; }
+      .leaderboard-table td { padding: 10px 6px; font-size: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img
+        src="https://i.postimg.cc/9fNDSz30/ac9a437c-35df-4b6e-9baa-8d08558366de.jpg"
+        alt="La Estancia"
+        class="logo"
+      />
+      <h1>Dashboard de Rendimiento</h1>
+      <p class="subtitle">Seguimiento de resenas y desempeno del equipo</p>
+      <div class="header-actions">
+        <button class="refresh-btn" onclick="loadDashboard()">Actualizar</button>
+        <a href="admin.html" class="admin-btn">Administrar Personal</a>
+      </div>
+    </header>
+
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <div class="stat-value" id="thisWeekTotal">-</div>
+        <div class="stat-label">Resenas Esta Semana</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalReviews">-</div>
+        <div class="stat-label">Total Historico</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="activeStaff">-</div>
+        <div class="stat-label">Personal Activo</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="pendingFeedback">-</div>
+        <div class="stat-label">Feedback Pendiente</div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="card">
+        <h2 class="card-title">Tabla de Posiciones</h2>
+        <p class="week-info" id="weekInfo">Cargando...</p>
+        <div id="leaderboardContainer">
+          <div class="loading">
+            <div class="spinner"></div>
+            Cargando datos...
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title">Feedback Reciente</h2>
+        <div id="feedbackContainer">
+          <div class="loading">
+            <div class="spinner"></div>
+            Cargando feedback...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwtA_7AzGxpxENgdewVEmI52JLwNV41kHP9LMuNe3lcKBCkdWJSIwjiv9GODGvFG0iC/exec";
+
+    async function loadDashboard() {
+      try {
+        const response = await fetch(WEBHOOK_URL + '?action=getDashboard');
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        // Update stats
+        document.getElementById('thisWeekTotal').textContent = data.stats.thisWeekReviews;
+        document.getElementById('totalReviews').textContent = data.stats.totalReviews;
+        document.getElementById('activeStaff').textContent = data.stats.activeStaff;
+        document.getElementById('pendingFeedback').textContent = data.stats.pendingFeedback;
+
+        // Update week info
+        const weekStart = new Date(data.stats.weekStart);
+        document.getElementById('weekInfo').textContent =
+          `Semana del ${weekStart.toLocaleDateString('es-MX', { weekday: 'long', month: 'long', day: 'numeric' })}`;
+
+        // Render leaderboard
+        renderLeaderboard(data.leaderboard);
+
+        // Render feedback
+        renderFeedback(data.recentFeedback);
+
+      } catch (error) {
+        console.error('Error loading dashboard:', error);
+        document.getElementById('leaderboardContainer').innerHTML =
+          '<div class="empty-state">Error al cargar datos. Intenta de nuevo.</div>';
+        document.getElementById('feedbackContainer').innerHTML =
+          '<div class="empty-state">Error al cargar feedback.</div>';
+      }
+    }
+
+    function renderLeaderboard(leaderboard) {
+      const container = document.getElementById('leaderboardContainer');
+
+      if (!leaderboard || leaderboard.length === 0) {
+        container.innerHTML = '<div class="empty-state">No hay datos esta semana</div>';
+        return;
+      }
+
+      let html = `
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nombre</th>
+              <th style="text-align:center">Semana</th>
+              <th style="text-align:center">Total</th>
+              <th style="text-align:center">Prom</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      leaderboard.forEach((staff, index) => {
+        const rank = index + 1;
+        const rankClass = rank <= 3 ? `rank-${rank}` : '';
+        const medal = rank === 1 ? ' &#x1F947;' : rank === 2 ? ' &#x1F948;' : rank === 3 ? ' &#x1F949;' : '';
+
+        html += `
+          <tr>
+            <td class="rank ${rankClass}">${rank}${medal}</td>
+            <td class="staff-name">${staff.name}</td>
+            <td class="week-count">${staff.thisWeek}</td>
+            <td style="text-align:center">${staff.allTime}</td>
+            <td class="avg-rating">${staff.avgRating || '-'}</td>
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    function renderFeedback(feedback) {
+      const container = document.getElementById('feedbackContainer');
+
+      if (!feedback || feedback.length === 0) {
+        container.innerHTML = '<div class="empty-state">No hay feedback reciente</div>';
+        return;
+      }
+
+      let html = '<div class="feedback-list">';
+
+      feedback.forEach(item => {
+        const stars = '&#x2605;'.repeat(parseInt(item.rating) || 0);
+        const date = item.date || 'Fecha desconocida';
+        const statusClass = item.status === 'New' ? 'status-new' : '';
+
+        html += `
+          <div class="feedback-item">
+            <div class="feedback-header">
+              <span class="feedback-rating">${stars} (${item.rating}/5)</span>
+              <span class="feedback-staff">${item.staffName || 'Desconocido'}</span>
+            </div>
+            <div class="feedback-text">"${item.feedback || 'Sin comentario'}"</div>
+            <div class="feedback-meta">
+              <span>${item.customerName}</span>
+              <span class="${statusClass}">${item.status || 'Pendiente'}</span>
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
+    // Load on page load
+    loadDashboard();
+
+    // Auto-refresh every 5 minutes
+    setInterval(loadDashboard, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

@@ -20,6 +20,9 @@
 // ========================================
 const MANAGER_EMAIL = "lbarwe1@gmail.com"; // Manager email for notifications
 
+// Admin password for staff management (change this!)
+const ADMIN_PASSWORD = "laestancia2024";
+
 /**
  * Run this function ONCE to set up your sheets
  * Click the function name in the dropdown above, then click the Run button (▶)
@@ -58,6 +61,12 @@ function initializeSheet() {
     allTimeStatsSheet = ss.insertSheet('All-Time Stats');
   }
 
+  // Get or create Staff sheet
+  let staffSheet = ss.getSheetByName('Staff');
+  if (!staffSheet) {
+    staffSheet = ss.insertSheet('Staff');
+  }
+
   // Setup Raw Data sheet
   setupRawDataSheet(rawDataSheet);
 
@@ -73,10 +82,13 @@ function initializeSheet() {
   // Setup All-Time Stats sheet
   setupAllTimeStatsSheet(allTimeStatsSheet, rawDataSheet);
 
+  // Setup Staff sheet
+  setupStaffSheet(staffSheet);
+
   // Make Leaderboard the active sheet
   ss.setActiveSheet(leaderboardSheet);
 
-  SpreadsheetApp.getUi().alert('✅ Sheets initialized!\n\n📊 Leaderboard - Current week + All-time\n📝 Raw Data - All timestamps\n💬 Feedback - Customer feedback\n📈 Weekly History - Past weeks archived\n🏆 All-Time Stats - Running totals');
+  SpreadsheetApp.getUi().alert('✅ Sheets initialized!\n\n📊 Leaderboard - Current week + All-time\n📝 Raw Data - All timestamps\n💬 Feedback - Customer feedback\n📈 Weekly History - Past weeks archived\n🏆 All-Time Stats - Running totals\n👥 Staff - Manage your team');
 }
 
 function setupRawDataSheet(sheet) {
@@ -177,12 +189,9 @@ function setupLeaderboardSheet(sheet, rawDataSheet) {
   sheet.getRange('A2').setFontSize(10).setFontColor('#999999');
   sheet.getRange('A2:J2').merge();
 
-  // Get all staff
-  const staff = [
-    'Eduardo', 'Pedro López', 'Pedro Orocio', 'Emiliano',
-    'David', 'Leo Gasca', 'Leo Reynoso', 'Ulises',
-    'Gerardo', 'Carlos', 'Julio', 'Fernando'
-  ];
+  // Get staff from Staff sheet (dynamic)
+  const staffMap = getStaffList();
+  const staff = Object.values(staffMap);
 
   // ===== THIS WEEK SECTION =====
   sheet.getRange('A4').setValue('📅 THIS WEEK\'S COMPETITION');
@@ -411,12 +420,9 @@ function setupAllTimeStatsSheet(sheet, rawDataSheet) {
   sheet.getRange('A2').setFontSize(10).setFontColor('#999999');
   sheet.getRange('A2:I2').merge();
 
-  // Get staff list
-  const staff = [
-    'Eduardo', 'Pedro López', 'Pedro Orocio', 'Emiliano',
-    'David', 'Leo Gasca', 'Leo Reynoso', 'Ulises',
-    'Gerardo', 'Carlos', 'Julio', 'Fernando'
-  ];
+  // Get staff from Staff sheet (dynamic)
+  const staffMap = getStaffList();
+  const staff = Object.values(staffMap);
 
   // Headers
   const headers = ['Rank', 'Staff Name', 'Total Reviews', 'Avg Rating', '5-Star', '4-Star', '3-Star', '2-Star', '1-Star'];
@@ -484,6 +490,324 @@ function setupAllTimeStatsSheet(sheet, rawDataSheet) {
   sheet.setColumnWidth(9, 80);   // 1-Star
 
   sheet.setFrozenRows(4);
+}
+
+/**
+ * Setup Staff sheet for dynamic staff management
+ * This allows adding/removing staff without code changes
+ */
+function setupStaffSheet(sheet) {
+  // Only setup if empty or headers missing
+  if (sheet.getLastRow() === 0 || sheet.getRange(1, 1).getValue() !== 'Code') {
+    sheet.clear();
+
+    // Add headers
+    sheet.appendRow(['Code', 'Name', 'Active', 'Added Date']);
+
+    // Format header row
+    const headerRange = sheet.getRange(1, 1, 1, 4);
+    headerRange.setFontWeight('bold');
+    headerRange.setBackground('#4CAF50');
+    headerRange.setFontColor('#ffffff');
+    headerRange.setHorizontalAlignment('center');
+    headerRange.setVerticalAlignment('middle');
+    headerRange.setBorder(true, true, true, true, false, false, '#ffffff', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+
+    // Add initial staff (migrating from hardcoded list)
+    const initialStaff = [
+      ['EDUARDO001', 'Eduardo', 'Yes', new Date()],
+      ['PEDROLOPEZ002', 'Pedro López', 'Yes', new Date()],
+      ['PEDROOROCIO003', 'Pedro Orocio', 'Yes', new Date()],
+      ['EMILIANO004', 'Emiliano', 'Yes', new Date()],
+      ['DAVID005', 'David', 'Yes', new Date()],
+      ['LEOGASCA006', 'Leo Gasca', 'Yes', new Date()],
+      ['LEOREYNOSO007', 'Leo Reynoso', 'Yes', new Date()],
+      ['ULISES008', 'Ulises', 'Yes', new Date()],
+      ['GERARDO009', 'Gerardo', 'Yes', new Date()],
+      ['CARLOS010', 'Carlos', 'Yes', new Date()],
+      ['JULIO011', 'Julio', 'Yes', new Date()],
+      ['FERNANDO012', 'Fernando', 'Yes', new Date()]
+    ];
+
+    sheet.getRange(2, 1, initialStaff.length, 4).setValues(initialStaff);
+
+    // Set column widths
+    sheet.setColumnWidth(1, 150);  // Code
+    sheet.setColumnWidth(2, 150);  // Name
+    sheet.setColumnWidth(3, 80);   // Active
+    sheet.setColumnWidth(4, 120);  // Added Date
+
+    // Freeze header
+    sheet.setFrozenRows(1);
+
+    // Add data validation for Active column
+    const activeRange = sheet.getRange(2, 3, 100, 1);
+    const rule = SpreadsheetApp.newDataValidation()
+      .requireValueInList(['Yes', 'No'], true)
+      .build();
+    activeRange.setDataValidation(rule);
+  }
+}
+
+/**
+ * Get staff list from Staff sheet
+ */
+function getStaffList() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let staffSheet = ss.getSheetByName('Staff');
+
+  // If no Staff sheet exists, return hardcoded fallback
+  if (!staffSheet) {
+    return {
+      "EDUARDO001": "Eduardo",
+      "PEDROLOPEZ002": "Pedro López",
+      "PEDROOROCIO003": "Pedro Orocio",
+      "EMILIANO004": "Emiliano",
+      "DAVID005": "David",
+      "LEOGASCA006": "Leo Gasca",
+      "LEOREYNOSO007": "Leo Reynoso",
+      "ULISES008": "Ulises",
+      "GERARDO009": "Gerardo",
+      "CARLOS010": "Carlos",
+      "JULIO011": "Julio",
+      "FERNANDO012": "Fernando"
+    };
+  }
+
+  const data = staffSheet.getDataRange().getValues();
+  const staffMap = {};
+
+  // Skip header row, only include active staff
+  for (let i = 1; i < data.length; i++) {
+    const code = data[i][0];
+    const name = data[i][1];
+    const active = data[i][2];
+
+    if (code && name && active === 'Yes') {
+      staffMap[code.toUpperCase()] = name;
+    }
+  }
+
+  return staffMap;
+}
+
+/**
+ * Get all staff (including inactive) for admin panel
+ */
+function getAllStaff() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let staffSheet = ss.getSheetByName('Staff');
+
+  if (!staffSheet) {
+    return [];
+  }
+
+  const data = staffSheet.getDataRange().getValues();
+  const staffList = [];
+
+  // Skip header row
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0]) {  // Has code
+      staffList.push({
+        code: data[i][0],
+        name: data[i][1],
+        active: data[i][2] === 'Yes',
+        addedDate: data[i][3]
+      });
+    }
+  }
+
+  return staffList;
+}
+
+/**
+ * Add a new staff member
+ */
+function addStaff(code, name) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let staffSheet = ss.getSheetByName('Staff');
+
+  if (!staffSheet) {
+    staffSheet = ss.insertSheet('Staff');
+    setupStaffSheet(staffSheet);
+  }
+
+  // Check if code already exists
+  const data = staffSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] && data[i][0].toString().toUpperCase() === code.toUpperCase()) {
+      return { success: false, message: 'Staff code already exists' };
+    }
+  }
+
+  // Add new staff
+  staffSheet.appendRow([code.toUpperCase(), name, 'Yes', new Date()]);
+
+  // Rebuild leaderboard to include new staff
+  rebuildLeaderboardFormulas();
+
+  return { success: true, message: 'Staff added successfully' };
+}
+
+/**
+ * Update staff member (toggle active status or update name)
+ */
+function updateStaff(code, name, active) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let staffSheet = ss.getSheetByName('Staff');
+
+  if (!staffSheet) {
+    return { success: false, message: 'Staff sheet not found' };
+  }
+
+  const data = staffSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] && data[i][0].toString().toUpperCase() === code.toUpperCase()) {
+      staffSheet.getRange(i + 1, 2).setValue(name);
+      staffSheet.getRange(i + 1, 3).setValue(active ? 'Yes' : 'No');
+      return { success: true, message: 'Staff updated successfully' };
+    }
+  }
+
+  return { success: false, message: 'Staff not found' };
+}
+
+/**
+ * Delete staff member (removes from sheet)
+ */
+function deleteStaff(code) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let staffSheet = ss.getSheetByName('Staff');
+
+  if (!staffSheet) {
+    return { success: false, message: 'Staff sheet not found' };
+  }
+
+  const data = staffSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] && data[i][0].toString().toUpperCase() === code.toUpperCase()) {
+      staffSheet.deleteRow(i + 1);
+      return { success: true, message: 'Staff deleted successfully' };
+    }
+  }
+
+  return { success: false, message: 'Staff not found' };
+}
+
+/**
+ * Rebuild leaderboard formulas when staff changes
+ */
+function rebuildLeaderboardFormulas() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const rawDataSheet = ss.getSheetByName('Raw Data');
+  const leaderboardSheet = ss.getSheetByName('Leaderboard');
+
+  if (leaderboardSheet && rawDataSheet) {
+    setupLeaderboardSheet(leaderboardSheet, rawDataSheet);
+  }
+
+  const allTimeSheet = ss.getSheetByName('All-Time Stats');
+  if (allTimeSheet && rawDataSheet) {
+    setupAllTimeStatsSheet(allTimeSheet, rawDataSheet);
+  }
+}
+
+/**
+ * Get dashboard data (leaderboard, recent activity, stats)
+ */
+function getDashboardData() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const rawDataSheet = ss.getSheetByName('Raw Data');
+  const feedbackSheet = ss.getSheetByName('Feedback');
+  const staffList = getStaffList();
+
+  // Calculate this week's date range
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  monday.setHours(0, 0, 0, 0);
+
+  // Get all raw data
+  const rawData = rawDataSheet ? rawDataSheet.getDataRange().getValues() : [];
+  const feedbackData = feedbackSheet ? feedbackSheet.getDataRange().getValues() : [];
+
+  // Calculate staff stats
+  const staffStats = {};
+  const staffNames = Object.values(staffList);
+
+  staffNames.forEach(name => {
+    staffStats[name] = {
+      name: name,
+      thisWeek: 0,
+      allTime: 0,
+      avgRating: 0,
+      ratings: [],
+      thisWeekRatings: []
+    };
+  });
+
+  // Process raw data
+  for (let i = 1; i < rawData.length; i++) {
+    const row = rawData[i];
+    const staffName = row[2];
+    const rating = parseInt(row[3]) || 5;
+    const rowDate = new Date(row[0]);
+
+    if (staffStats[staffName]) {
+      staffStats[staffName].allTime++;
+      staffStats[staffName].ratings.push(rating);
+
+      if (rowDate >= monday) {
+        staffStats[staffName].thisWeek++;
+        staffStats[staffName].thisWeekRatings.push(rating);
+      }
+    }
+  }
+
+  // Calculate averages
+  Object.keys(staffStats).forEach(name => {
+    const stats = staffStats[name];
+    if (stats.ratings.length > 0) {
+      stats.avgRating = (stats.ratings.reduce((a, b) => a + b, 0) / stats.ratings.length).toFixed(1);
+    }
+  });
+
+  // Sort by this week's count for leaderboard
+  const leaderboard = Object.values(staffStats)
+    .sort((a, b) => b.thisWeek - a.thisWeek);
+
+  // Get recent feedback (last 10)
+  const recentFeedback = [];
+  for (let i = feedbackData.length - 1; i >= 1 && recentFeedback.length < 10; i--) {
+    const row = feedbackData[i];
+    recentFeedback.push({
+      timestamp: row[0],
+      rating: row[1],
+      staffName: row[3],
+      customerName: row[4] || 'Anonymous',
+      feedback: row[6],
+      status: row[7],
+      date: row[8]
+    });
+  }
+
+  // Calculate overall stats
+  const totalReviews = rawData.length - 1;
+  const thisWeekReviews = leaderboard.reduce((sum, s) => sum + s.thisWeek, 0);
+  const pendingFeedback = feedbackData.filter(row => row[7] === 'New').length;
+
+  return {
+    leaderboard: leaderboard,
+    recentFeedback: recentFeedback,
+    stats: {
+      totalReviews: totalReviews,
+      thisWeekReviews: thisWeekReviews,
+      pendingFeedback: pendingFeedback,
+      activeStaff: staffNames.length,
+      weekStart: monday.toISOString()
+    }
+  };
 }
 
 /**
@@ -633,10 +957,94 @@ This is an automated message from La Estancia Review Tracking System.
 }
 
 function doGet(e) {
-  // Handle GET requests (for testing)
-  return ContentService
-    .createTextOutput('La Estancia Review Tracker is running. Use POST requests to log data.')
-    .setMimeType(ContentService.MimeType.TEXT);
+  // Handle GET requests for dashboard and staff management
+  const action = e.parameter.action || 'status';
+
+  try {
+    let result;
+
+    switch (action) {
+      case 'getStaff':
+        // Get staff list for review page
+        result = getStaffList();
+        break;
+
+      case 'getAllStaff':
+        // Get all staff (including inactive) for admin
+        const password = e.parameter.password;
+        if (password !== ADMIN_PASSWORD) {
+          result = { error: 'Invalid password' };
+        } else {
+          result = getAllStaff();
+        }
+        break;
+
+      case 'getDashboard':
+        // Get dashboard data
+        result = getDashboardData();
+        break;
+
+      case 'addStaff':
+        // Add new staff member
+        const addPassword = e.parameter.password;
+        if (addPassword !== ADMIN_PASSWORD) {
+          result = { success: false, message: 'Invalid password' };
+        } else {
+          const code = e.parameter.code;
+          const name = e.parameter.name;
+          if (!code || !name) {
+            result = { success: false, message: 'Code and name are required' };
+          } else {
+            result = addStaff(code, name);
+          }
+        }
+        break;
+
+      case 'updateStaff':
+        // Update staff member
+        const updatePassword = e.parameter.password;
+        if (updatePassword !== ADMIN_PASSWORD) {
+          result = { success: false, message: 'Invalid password' };
+        } else {
+          const updateCode = e.parameter.code;
+          const updateName = e.parameter.name;
+          const active = e.parameter.active === 'true';
+          result = updateStaff(updateCode, updateName, active);
+        }
+        break;
+
+      case 'deleteStaff':
+        // Delete staff member
+        const deletePassword = e.parameter.password;
+        if (deletePassword !== ADMIN_PASSWORD) {
+          result = { success: false, message: 'Invalid password' };
+        } else {
+          const deleteCode = e.parameter.code;
+          result = deleteStaff(deleteCode);
+        }
+        break;
+
+      case 'status':
+      default:
+        result = {
+          status: 'running',
+          message: 'La Estancia Review Tracker is running',
+          version: '2.0',
+          features: ['Dynamic staff management', 'Dashboard API', 'Admin panel']
+        };
+    }
+
+    return ContentService
+      .createTextOutput(JSON.stringify(result))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        error: error.toString()
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 // ========================================
@@ -1042,12 +1450,9 @@ function archiveAndResetWeeklyLeaderboard() {
     return;
   }
 
-  // Calculate stats for each staff member
-  const staff = [
-    'Eduardo', 'Pedro López', 'Pedro Orocio', 'Emiliano',
-    'David', 'Leo Gasca', 'Leo Reynoso', 'Ulises',
-    'Gerardo', 'Carlos', 'Julio', 'Fernando'
-  ];
+  // Get staff from Staff sheet (dynamic)
+  const staffMap = getStaffList();
+  const staff = Object.values(staffMap);
 
   const staffStats = {};
 
