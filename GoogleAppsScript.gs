@@ -374,7 +374,14 @@ function setupLeaderboardSheet(sheet, rawDataSheet) {
 }
 
 // Setup Weekly History Sheet
+// SAFE: Only sets up if sheet is empty or missing headers
 function setupWeeklyHistorySheet(sheet) {
+  // Check if sheet already has data - DON'T clear it!
+  if (sheet.getLastRow() > 1 && sheet.getRange(1, 1).getValue().toString().includes('WEEKLY')) {
+    Logger.log('Weekly History sheet already has data - skipping setup to preserve history');
+    return; // Exit without clearing - preserve existing data!
+  }
+
   sheet.clear();
 
   sheet.getRange('A1').setValue('📈 WEEKLY PERFORMANCE HISTORY');
